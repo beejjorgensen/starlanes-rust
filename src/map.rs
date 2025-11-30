@@ -11,9 +11,9 @@ pub enum MapCell {
 
 #[derive(Debug)]
 pub struct Map {
-    width: usize,
-    height: usize,
-    data: Vec<Vec<MapCell>>,
+    pub width: usize,
+    pub height: usize,
+    pub data: Vec<Vec<MapCell>>,
 }
 
 const DEFAULT_WIDTH: usize = 13;

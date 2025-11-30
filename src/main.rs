@@ -1,7 +1,10 @@
 use starlanes::map::Map;
 
+mod ui;
+
 fn main() {
     let m = Map::new();
 
-    println!("{:#?}", m);
+    ui::display_map(m);
+    //println!("{:#?}", m);
 }
