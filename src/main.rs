@@ -4,8 +4,11 @@ use std::io::Write;
 
 mod ui;
 
+/// Simulates a formfeed.
+///
+/// This would eject a sheet of paper on a teletype, but it's annoying
+/// on a screen unless it's a clear. So it's been reduced here.
 fn formfeed() {
-    // 25 maybe more accurate but more annoying
     const LINEFEEDS_PER_FORMFEED: usize = 5;
 
     for _ in 0..LINEFEEDS_PER_FORMFEED {
@@ -13,10 +16,19 @@ fn formfeed() {
     }
 }
 
+/// Moves the cursor to the nth column to the right.
+///
+/// This simulates the BASIC `TAB` function. Effectively it prints n-1
+/// spaces so the the next character will be in the nth column.
 fn tab(n: usize) -> String {
     format!("{:>width$}", "", width = n - 1)
 }
 
+/// Read a line of text from stdin.
+///
+/// This simulates the BASIC `INPUT` statement to a degree, the main
+/// difference being that it always returns a string. It's up to the
+/// caller to convert to other types as needed.
 fn input() -> String {
     print!("? ");
     _ = io::stdout().flush();
@@ -26,20 +38,23 @@ fn input() -> String {
 
     // Original game only allowed uppercase input, but we'll take this
     // liberty to keep the user from going insane.
-    input.to_uppercase()
+    input.to_uppercase().trim().to_string()
 }
 
+/// Print the game title
 fn print_title() {
     formfeed();
     println!("\n\n{}* S * T * A * R ** L * A * N * E * S *", tab(10));
 }
 
+/// Prompt for and get the player count
 fn get_player_count() -> usize {
     print!("HOW MANY PLAYERS (2-4)");
     let count = input();
-    count.trim().parse().unwrap()
+    count.parse().unwrap()
 }
 
+/// Prompt for and display instructions
 fn instructions() {
     print!("DOES ANY PLAYER NEED INSTRUCTIONS");
     let yn = input();
@@ -130,6 +145,7 @@ fn instructions() {
     }
 }
 
+/// Main
 fn main() {
     let mut game = StarLanes::new();
 
