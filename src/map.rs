@@ -1,5 +1,5 @@
-use rand::Rng;
 use crate::company;
+use rand::Rng;
 
 #[derive(Debug)]
 pub enum MapCell {
@@ -16,6 +16,12 @@ pub struct Map {
     pub data: Vec<Vec<MapCell>>,
 }
 
+impl Default for Map {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 const DEFAULT_WIDTH: usize = 13;
 const DEFAULT_HEIGHT: usize = 9;
 const DEFAULT_STAR_PROBABILITY: f32 = 0.05;
@@ -24,7 +30,7 @@ impl Map {
     pub fn new() -> Self {
         Self::new_with_params(DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_STAR_PROBABILITY)
     }
-    
+
     pub fn new_with_params(width: usize, height: usize, starp: f32) -> Self {
         let mut data: Vec<Vec<MapCell>> = Vec::new();
         let mut rng = rand::rng();

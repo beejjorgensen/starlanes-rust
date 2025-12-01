@@ -18,6 +18,12 @@ pub struct StarLanes {
     current_player: usize,
 }
 
+impl Default for StarLanes {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl StarLanes {
     pub fn new() -> Self {
         StarLanes {
@@ -31,7 +37,7 @@ impl StarLanes {
     pub fn init(&mut self, player_count: usize) {
         let mut rng = rand::rng();
 
-        if player_count < 1 || player_count > 4 {
+        if !(1..=4).contains(&player_count) {
             panic!("invalid player count");
         }
 
@@ -40,7 +46,7 @@ impl StarLanes {
 
         self.current_player = rng.random_range(0..self.player_count);
     }
-        
+
     pub fn get_current_player(&self) -> usize {
         self.current_player
     }

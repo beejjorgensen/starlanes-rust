@@ -1,6 +1,6 @@
+use starlanes::company::Company::*;
 use starlanes::map::Map;
 use starlanes::map::MapCell::*;
-use starlanes::company::Company::*;
 
 pub fn display_map(m: &Map) {
     for row in &m.data {
