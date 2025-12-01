@@ -1,6 +1,7 @@
 # Star Lanes, Rust
 
-This is a port of the classic BASIC game [Star Lanes] to Rust.
+This is a port of the classic BASIC game [Star
+Lanes](https://github.com/beejjorgensen/starlanes-info) to Rust.
 
 ## Usage
 
@@ -23,7 +24,9 @@ relatively easy to bolt on.
 
 All my code is Unlicensed. However, the game itself contains text that
 is copyrighted by the original author. I plead fair use for that, but if
-you're still out there, Steven Faber, drop me a line.
+you're still out there, [Steven
+Faber](https://www.mobygames.com/person/635973/steven-faber/credits/),
+drop me a line.
 
 ```
 THE GAME OF STAR LANES - AN INTERSTELLAR COMMERCE GAME
