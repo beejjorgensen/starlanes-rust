@@ -145,6 +145,29 @@ fn instructions() {
     }
 }
 
+/// Get the player names.
+fn get_player_names(count: usize) -> Vec<String> {
+    let mut names: Vec<String> = Vec::new();
+
+    for i in 1..=count {
+        print!("PLAYER {i} WHAT IS YOUR NAME");
+        names.push(input())
+    }
+
+    names
+}
+
+/// Print out who goes first
+///
+/// The game has already decided this, so it's just informational.
+fn go_first_message(game: &StarLanes, names: &[String]) {
+    println!("\nNOW I WILL DECIDED WHO GOES FIRST...\n"); // DECIDED sic
+
+    let current_player = game.get_current_player();
+
+    println!("{} IS THE FIRST PLAYER TO MOVE.\n", names[current_player]);
+}
+
 /// Main
 fn main() {
     let mut game = StarLanes::new();
@@ -157,9 +180,9 @@ fn main() {
 
     instructions();
 
-    //let names = get_player_names(player_count);
+    let names = get_player_names(player_count);
+
+    go_first_message(&game, &names);
 
     ui::display_map(&game.map);
-
-    println!("Current player: {}", game.get_current_player());
 }
