@@ -5,7 +5,10 @@ use std::io::Write;
 mod ui;
 
 fn formfeed() {
-    for _ in 0..25 {
+    // 25 maybe more accurate but more annoying
+    const LINEFEEDS_PER_FORMFEED: usize = 5;
+
+    for _ in 0..LINEFEEDS_PER_FORMFEED {
         println!();
     }
 }
@@ -21,14 +24,14 @@ fn input() -> String {
     let mut input = String::new();
     _ = io::stdin().read_line(&mut input);
 
+    // Original game only allowed uppercase input, but we'll take this
+    // liberty to keep the user from going insane.
     input.to_uppercase()
 }
 
 fn print_title() {
     formfeed();
-    println!();
-    println!();
-    println!("{}* S * T * A * R ** L * A * N * E * S *", tab(10));
+    println!("\n\n{}* S * T * A * R ** L * A * N * E * S *", tab(10));
 }
 
 fn get_player_count() -> usize {
