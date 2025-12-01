@@ -2,8 +2,8 @@ use starlanes::map::Map;
 use starlanes::map::MapCell::*;
 use starlanes::company::Company::*;
 
-pub fn display_map(m: Map) {
-    for row in m.data {
+pub fn display_map(m: &Map) {
+    for row in &m.data {
         for cell in row {
             let character = match cell {
                 Space => '.',

@@ -1,10 +1,12 @@
-use starlanes::map::Map;
+use starlanes::starlanes::StarLanes;
 
 mod ui;
 
 fn main() {
-    let m = Map::new();
+    let mut g = StarLanes::new();
 
-    ui::display_map(m);
-    //println!("{:#?}", m);
+    g.init(3);
+
+    ui::display_map(&g.map);
+    println!("Current player: {}", g.get_current_player());
 }
