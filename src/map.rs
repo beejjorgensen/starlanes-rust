@@ -23,7 +23,7 @@ impl Default for Map {
     }
 }
 
-const DEFAULT_WIDTH: usize = 13;
+const DEFAULT_WIDTH: usize = 12;
 const DEFAULT_HEIGHT: usize = 9;
 const DEFAULT_STAR_PROBABILITY: f32 = 0.05;
 
