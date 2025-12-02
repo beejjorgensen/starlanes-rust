@@ -1,63 +1,24 @@
 use starlanes::starlanes::StarLanes;
-use std::io;
-use std::io::Write;
 
 mod ui;
 
-/// Simulates a formfeed.
-///
-/// This would eject a sheet of paper on a teletype, but it's annoying
-/// on a screen unless it's a clear. So it's been reduced here.
-fn formfeed() {
-    const LINEFEEDS_PER_FORMFEED: usize = 5;
-
-    for _ in 0..LINEFEEDS_PER_FORMFEED {
-        println!();
-    }
-}
-
-/// Moves the cursor to the nth column to the right.
-///
-/// This simulates the BASIC `TAB` function. Effectively it prints n-1
-/// spaces so the the next character will be in the nth column.
-fn tab(n: usize) -> String {
-    format!("{:>width$}", "", width = n - 1)
-}
-
-/// Read a line of text from stdin.
-///
-/// This simulates the BASIC `INPUT` statement to a degree, the main
-/// difference being that it always returns a string. It's up to the
-/// caller to convert to other types as needed.
-fn input() -> String {
-    print!("? ");
-    _ = io::stdout().flush();
-
-    let mut input = String::new();
-    _ = io::stdin().read_line(&mut input);
-
-    // Original game only allowed uppercase input, but we'll take this
-    // liberty to keep the user from going insane.
-    input.to_uppercase().trim().to_string()
-}
-
 /// Print the game title
 fn print_title() {
-    formfeed();
-    println!("\n\n{}* S * T * A * R ** L * A * N * E * S *", tab(10));
+    ui::formfeed();
+    println!("\n\n{}* S * T * A * R ** L * A * N * E * S *", ui::tab(10));
 }
 
 /// Prompt for and get the player count
 fn get_player_count() -> usize {
     print!("HOW MANY PLAYERS (2-4)");
-    let count = input();
+    let count = ui::input();
     count.parse().unwrap()
 }
 
 /// Prompt for and display instructions
 fn instructions() {
     print!("DOES ANY PLAYER NEED INSTRUCTIONS");
-    let yn = input();
+    let yn = ui::input();
 
     if &yn[..1] == "Y" {
         println!("\n   STAR LANES IS A GAME OF INTERSTELLAR TRADING.");
@@ -151,7 +112,7 @@ fn get_player_names(count: usize) -> Vec<String> {
 
     for i in 1..=count {
         print!("PLAYER {i} WHAT IS YOUR NAME");
-        names.push(input())
+        names.push(ui::input())
     }
 
     names
