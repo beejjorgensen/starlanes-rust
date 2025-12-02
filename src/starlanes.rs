@@ -4,9 +4,9 @@ use rand::Rng;
 
 const MAX_TURNS: usize = 48;
 
-struct Point(usize, usize);
+pub struct Point(pub usize, pub usize);
 
-#[derive(Debug)]
+#[derive(Debug,PartialEq)]
 enum GameState {
     PreInit,
     BeginTurn,
@@ -21,6 +21,7 @@ pub struct StarLanes {
     pub map: Map,
 
     turn_count: usize,
+    turn: usize,
     state: GameState,
     player_count: usize,
     current_player: usize,
@@ -40,6 +41,8 @@ impl StarLanes {
             state: PreInit,
             player_count: 0,
             current_player: 0,
+            turn_count: 0,
+            turn: 0,
             players: Vec::new(),
         }
     }
@@ -68,9 +71,9 @@ impl StarLanes {
         self.current_player
     }
     
-    pub fn begin_turn(&self) {
+    pub fn begin_turn(&mut self) {
         if self.state != BeginTurn {
-            panic!("begin_turn: invalid state: {}", self.state);
+            panic!("begin_turn: invalid state: {:#?}", self.state);
         }
 
         if self.turn >= MAX_TURNS {
@@ -78,22 +81,22 @@ impl StarLanes {
             return;
         }
 
-        self.player = (self.player + 1) % self.player_count;
+        self.current_player = (self.current_player + 1) % self.player_count;
 
         self.state = GetMoves;
     }
 
-    pub fn get_moves(&self) {
+    pub fn get_moves(&self) -> Vec<Point> {
         if self.state != GetMoves {
-            panic!("get_moves: invalid state: {}", self.state);
+            panic!("get_moves: invalid state: {:#?}", self.state);
         }
 
         // Loop through map getting candidate moves
         let mut candidates: Vec<Point> = Vec::new();
 
-        for (r, row) in self.map.iter().enumerate() {
-            for (c, col) in row.iter().enumerate() {
-                if map.data[r][c] == MapCell::Space {
+        for (r, row) in self.map.data.iter().enumerate() {
+            for (c, mapcell) in row.iter().enumerate() {
+                if *mapcell == MapCell::Space {
                     candidates.push(Point(r, c));
                 }
             }
