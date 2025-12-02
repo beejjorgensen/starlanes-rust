@@ -1,4 +1,3 @@
-use crate::company;
 use rand::Rng;
 
 #[derive(Debug,PartialEq)]
@@ -6,7 +5,7 @@ pub enum MapCell {
     Space,
     Outpost,
     Star,
-    Company(company::Company),
+    Company(u32),
 }
 
 #[derive(Debug)]

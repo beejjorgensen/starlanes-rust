@@ -26,6 +26,7 @@ pub struct StarLanes {
     player_count: usize,
     current_player: usize,
     players: Vec<Player>,
+    company_count: usize,
 }
 
 impl Default for StarLanes {
@@ -44,6 +45,7 @@ impl StarLanes {
             turn_count: 0,
             turn: 0,
             players: Vec::new(),
+            company_count: 5,
         }
     }
 
@@ -61,7 +63,7 @@ impl StarLanes {
         self.current_player = rng.random_range(0..self.player_count);
 
         for _ in 0..player_count {
-            self.players.push(Player::new());
+            self.players.push(Player::new(self.company_count));
         }
 
         self.state = BeginTurn;

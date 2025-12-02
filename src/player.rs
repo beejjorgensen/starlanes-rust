@@ -1,16 +1,13 @@
-use crate::company::COMPANY_COUNT;
-
 #[derive(Debug)]
 pub struct Player {
-    holdings: [u64; COMPANY_COUNT],
+    holdings: Vec<u64>,
     cash: u64,
 }
 
 impl Player {
-    pub fn new() -> Self {
-        //let mut holdings:[u64: COMPANY_COUNT] = [0, COMPANY_COUNT]
+    pub fn new(company_count: usize) -> Self {
         Player {
-            holdings: [0; COMPANY_COUNT],
+            holdings: vec![0; company_count],
             cash: 0,
         }
     }
@@ -18,6 +15,6 @@ impl Player {
 
 impl Default for Player {
     fn default() -> Self {
-        Self::new()
+        Self::new(5)
     }
 }
