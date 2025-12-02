@@ -185,4 +185,13 @@ fn main() {
     go_first_message(&game, &names);
 
     ui::display_map(&game.map);
+
+    game.begin_turn();
+
+    let candidates = game.get_moves();
+
+    for c in candidates {
+        print!("[{},{}] ", c.0, c.1);
+    }
+    println!();
 }
