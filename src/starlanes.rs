@@ -1,4 +1,5 @@
 use crate::map::Map;
+use crate::player::Player;
 use rand::Rng;
 
 #[derive(Debug)]
@@ -16,6 +17,7 @@ pub struct StarLanes {
     state: GameState,
     player_count: usize,
     current_player: usize,
+    players: Vec<Player>,
 }
 
 impl Default for StarLanes {
@@ -31,6 +33,7 @@ impl StarLanes {
             state: PreInit,
             player_count: 0,
             current_player: 0,
+            players: Vec::new(),
         }
     }
 
@@ -45,6 +48,10 @@ impl StarLanes {
         self.state = Ready;
 
         self.current_player = rng.random_range(0..self.player_count);
+
+        for _ in 0..player_count {
+            self.players.push(Player::new());
+        }
     }
 
     pub fn get_current_player(&self) -> usize {
