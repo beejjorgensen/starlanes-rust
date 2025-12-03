@@ -1,4 +1,4 @@
-use starlanes::starlanes::StarLanes;
+use starlanes::starlanes::{Point, StarLanes};
 
 mod ui;
 
@@ -129,6 +129,21 @@ fn go_first_message(game: &StarLanes, names: &[String]) {
     println!("{} IS THE FIRST PLAYER TO MOVE.\n", names[current_player]);
 }
 
+fn get_move(name: &String, candidates: &Vec<Point>) -> usize {
+    println!("\n{}, HERE ARE YOUR LEGAL MOVES FOR THIS TURN:", name);
+
+    for Point(r, c) in candidates {
+        print!(" {} {} /", r + 1, (b'A' + (*c as u8)) as char);
+    }
+
+    print!("\nWHAT IS YOUR MOVE");
+
+    let player_move_str = ui::input();
+
+    // TODO
+    0
+}
+
 /// Main
 fn main() {
     let mut game = StarLanes::new();
@@ -151,8 +166,8 @@ fn main() {
 
     let candidates = game.get_moves();
 
-    for c in candidates {
-        print!("[{},{}] ", c.0, c.1);
-    }
-    println!();
+    get_move(&names[game.get_current_player()], &candidates);
+
+    //for c in candidates { print!("[{},{}] ", c.0, c.1); }
+    //println!();
 }
