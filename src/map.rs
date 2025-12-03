@@ -1,6 +1,6 @@
 use rand::Rng;
 
-#[derive(Debug,PartialEq)]
+#[derive(Debug, PartialEq)]
 pub enum MapCell {
     Space,
     Outpost,

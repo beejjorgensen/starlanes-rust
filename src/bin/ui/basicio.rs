@@ -37,4 +37,3 @@ pub fn input() -> String {
     // liberty to keep the user from going insane.
     input.to_uppercase().trim().to_string()
 }
-
