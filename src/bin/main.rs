@@ -145,9 +145,8 @@ fn get_move(game: &StarLanes, name: &str, candidates: &[Point]) -> usize {
             println!("THAT SPACE WAS NOT INCLUDED IN THE LIST...");
             show_error = false;
         } else {
-            println!();
             if bug_first {
-                print!("{name}");
+                print!("\n{name}");
                 bug_first = false;
             }
             println!(", HERE ARE YOUR LEGAL MOVES FOR THIS TURN:");
@@ -155,9 +154,10 @@ fn get_move(game: &StarLanes, name: &str, candidates: &[Point]) -> usize {
             for &Point(r, c) in candidates {
                 print!(" {} {} /", r + 1, (b'A' + (c as u8)) as char);
             }
+            println!();
         }
 
-        print!("\nWHAT IS YOUR MOVE");
+        print!("WHAT IS YOUR MOVE");
 
         let input = ui::input();
 
@@ -167,6 +167,7 @@ fn get_move(game: &StarLanes, name: &str, candidates: &[Point]) -> usize {
         }
 
         if input.starts_with('M') {
+            println!();
             ui::display_map(&game.map);
             continue;
         }
