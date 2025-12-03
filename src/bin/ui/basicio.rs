@@ -1,16 +1,9 @@
 use std::io;
 use std::io::Write;
 
-/// Simulates a formfeed.
-///
-/// This would eject a sheet of paper on a teletype, but it's annoying
-/// on a screen unless it's a clear. So it's been reduced here.
+/// Prints a formfeed.
 pub fn formfeed() {
-    const LINEFEEDS_PER_FORMFEED: usize = 5;
-
-    for _ in 0..LINEFEEDS_PER_FORMFEED {
-        println!();
-    }
+    print!("{}", 12 as char);
 }
 
 /// Moves the cursor to the nth column to the right.
