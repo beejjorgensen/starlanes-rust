@@ -5,7 +5,7 @@ mod ui;
 /// Print the game title
 fn print_title() {
     ui::formfeed();
-    println!("\n\n{}* S * T * A * R ** L * A * N * E * S *", ui::tab(10));
+    println!("\n\n\n{}* S * T * A * R ** L * A * N * E * S *", ui::tab(10));
 }
 
 /// Prompt for and get the player count
