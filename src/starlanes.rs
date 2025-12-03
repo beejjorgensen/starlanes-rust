@@ -101,9 +101,11 @@ impl StarLanes {
             return;
         }
 
-        self.current_player = (self.current_player + 1) % self.player_count;
-
         self.state = GetMoves;
+    }
+
+    pub fn next_player(&mut self) {
+        self.current_player = (self.current_player + 1) % self.player_count;
     }
 
     fn neighbor_count(&self, at_row: usize, at_col: usize) -> NeighborCounts {
