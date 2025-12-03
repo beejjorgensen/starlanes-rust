@@ -132,19 +132,18 @@ fn go_first_message(game: &StarLanes, names: &[String]) {
     println!("{} IS THE FIRST PLAYER TO MOVE.\n", names[current_player]);
 }
 
-fn get_move(game: &StarLanes, name: &String, candidates: &Vec<Point>) -> usize {
-    let mut bad = false;
-    let mut candidate_index: usize = 9999;
-
+fn get_move(game: &StarLanes, name: &str, candidates: &[Point]) -> usize {
     // There is a bug in the original source where the name wasn't printed
     // again if a 'M'ap or 'S'tocks were requested. This horrid thing
     // recreates that bug.
     let mut bug_first = true;
 
+    let mut show_error = false;
+
     loop {
-        if bad {
+        if show_error {
             println!("THAT SPACE WAS NOT INCLUDED IN THE LIST...");
-            bad = false;
+            show_error = false;
         } else {
             println!();
             if bug_first {
@@ -153,60 +152,55 @@ fn get_move(game: &StarLanes, name: &String, candidates: &Vec<Point>) -> usize {
             }
             println!(", HERE ARE YOUR LEGAL MOVES FOR THIS TURN:");
 
-            for Point(r, c) in candidates {
-                print!(" {} {} /", r + 1, (b'A' + (*c as u8)) as char);
+            for &Point(r, c) in candidates {
+                print!(" {} {} /", r + 1, (b'A' + (c as u8)) as char);
             }
         }
 
         print!("\nWHAT IS YOUR MOVE");
 
-        let player_move_str = ui::input();
+        let input = ui::input();
 
-        if player_move_str.is_empty() {
-            bad = true;
+        if input.is_empty() {
+            show_error = true;
             continue;
         }
 
-        if player_move_str.starts_with('M') {
+        if input.starts_with('M') {
             ui::display_map(&game.map);
             continue;
         }
 
-        if player_move_str.len() < 2 {
-            bad = true;
+        if input.len() < 2 {
+            show_error = true;
             continue;
         }
 
-        let mut selrow: usize = 9999;
-        let mut selcol: usize = 9999;
+        let (row_str, col_str) = input.split_at(input.len() - 1);
 
-        // Unwrap safe here since the string is at least 2 long
-        let lchars = player_move_str.get(0..player_move_str.len() - 1).unwrap();
+        let selrow = match row_str.trim().parse::<usize>() {
+            Ok(n) => n - 1,
+            _ => {
+                show_error = true;
+                continue;
+            }
+        };
 
-        if let Ok(s) = lchars.trim().parse::<usize>() {
-            selrow = s - 1;
+        let col_char = col_str.chars().next().unwrap();
+        let selcol = match col_char {
+            'A'..='Z' => (col_char as u8 - b'A') as usize,
+            _ => {
+                show_error = true;
+                continue;
+            }
+        };
+
+        if let Some(i) = candidates.iter().position(|p| *p == Point(selrow, selcol)) {
+            return i;
         }
 
-        // Unwrap safe here since the string is at least len-1 long
-        let rchars = player_move_str.get(player_move_str.len() - 1..).unwrap();
-        let rchar = rchars.chars().next().unwrap();
-
-        if rchar as u8 >= b'A' {
-            selcol = (rchar as u8 - b'A') as usize;
-        }
-
-        if let Some(i) = candidates.iter().position(|p| p == &Point(selrow, selcol)) {
-            candidate_index = i;
-        } else {
-            bad = true;
-        }
-
-        if !bad {
-            break;
-        }
+        show_error = true;
     }
-
-    candidate_index
 }
 
 /// Main
