@@ -5,7 +5,10 @@ mod ui;
 /// Print the game title
 fn print_title() {
     ui::formfeed();
-    println!("\n\n\n{}* S * T * A * R ** L * A * N * E * S *", ui::tab(10));
+    println!(
+        "\n\n\n{}* S * T * A * R ** L * A * N * E * S *",
+        ui::tab(10)
+    );
 }
 
 /// Prompt for and get the player count
@@ -129,19 +132,81 @@ fn go_first_message(game: &StarLanes, names: &[String]) {
     println!("{} IS THE FIRST PLAYER TO MOVE.\n", names[current_player]);
 }
 
-fn get_move(name: &String, candidates: &Vec<Point>) -> usize {
-    println!("\n{}, HERE ARE YOUR LEGAL MOVES FOR THIS TURN:", name);
+fn get_move(game: &StarLanes, name: &String, candidates: &Vec<Point>) -> usize {
+    let mut bad = false;
+    let mut candidate_index: usize = 9999;
 
-    for Point(r, c) in candidates {
-        print!(" {} {} /", r + 1, (b'A' + (*c as u8)) as char);
+    // There is a bug in the original source where the name wasn't printed
+    // again if a 'M'ap or 'S'tocks were requested. This horrid thing
+    // recreates that bug.
+    let mut bug_first = true;
+
+    loop {
+        if bad {
+            println!("THAT SPACE WAS NOT INCLUDED IN THE LIST...");
+            bad = false;
+        } else {
+            println!();
+            if bug_first {
+                print!("{name}");
+                bug_first = false;
+            }
+            println!(", HERE ARE YOUR LEGAL MOVES FOR THIS TURN:");
+
+            for Point(r, c) in candidates {
+                print!(" {} {} /", r + 1, (b'A' + (*c as u8)) as char);
+            }
+        }
+
+        print!("\nWHAT IS YOUR MOVE");
+
+        let player_move_str = ui::input();
+
+        if player_move_str.is_empty() {
+            bad = true;
+            continue;
+        }
+
+        if player_move_str.starts_with('M') {
+            ui::display_map(&game.map);
+            continue;
+        }
+
+        if player_move_str.len() < 2 {
+            bad = true;
+            continue;
+        }
+
+        let mut selrow: usize = 9999;
+        let mut selcol: usize = 9999;
+
+        // Unwrap safe here since the string is at least 2 long
+        let lchars = player_move_str.get(0..player_move_str.len() - 1).unwrap();
+
+        if let Ok(s) = lchars.trim().parse::<usize>() {
+            selrow = s - 1;
+        }
+
+        // Unwrap safe here since the string is at least len-1 long
+        let rchars = player_move_str.get(player_move_str.len() - 1..).unwrap();
+        let rchar = rchars.chars().next().unwrap();
+
+        if rchar as u8 >= b'A' {
+            selcol = (rchar as u8 - b'A') as usize;
+        }
+
+        if let Some(i) = candidates.iter().position(|p| p == &Point(selrow, selcol)) {
+            candidate_index = i;
+        } else {
+            bad = true;
+        }
+
+        if !bad {
+            break;
+        }
     }
 
-    print!("\nWHAT IS YOUR MOVE");
-
-    let player_move_str = ui::input();
-
-    // TODO
-    0
+    candidate_index
 }
 
 /// Main
@@ -166,7 +231,12 @@ fn main() {
 
     let candidates = game.get_moves();
 
-    get_move(&names[game.get_current_player()], &candidates);
+    let candidate_index = get_move(&game, &names[game.get_current_player()], &candidates);
+
+    println!(
+        "{} [{},{}]",
+        candidate_index, candidates[candidate_index].0, candidates[candidate_index].1
+    );
 
     //for c in candidates { print!("[{},{}] ", c.0, c.1); }
     //println!();

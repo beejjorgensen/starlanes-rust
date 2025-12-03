@@ -8,6 +8,7 @@ const MAX_TURNS: usize = 48;
 const DEFAULT_MAX_COMPANY_COUNT: usize = 5;
 const CANDIDATE_MOVE_COUNT: usize = 5;
 
+#[derive(PartialEq)]
 pub struct Point(pub usize, pub usize);
 
 #[derive(Debug, PartialEq)]
