@@ -8,14 +8,14 @@ const MAX_TURNS: usize = 48;
 const DEFAULT_MAX_COMPANY_COUNT: usize = 5;
 const CANDIDATE_MOVE_COUNT: usize = 5;
 
-#[derive(PartialEq)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub struct Point(pub usize, pub usize);
 
 #[derive(Debug, PartialEq)]
 enum GameState {
     PreInit,
     BeginTurn,
-    GetMoves,
+    Move,
     GameOver,
 }
 
@@ -33,6 +33,7 @@ pub struct StarLanes {
     players: Vec<Player>,
     max_company_count: usize,
     companies: Vec<Company>,
+    candidate_moves: Vec<Point>,
 }
 
 impl Default for StarLanes {
@@ -59,6 +60,7 @@ impl StarLanes {
             players: Vec::new(),
             max_company_count: DEFAULT_MAX_COMPANY_COUNT,
             companies: Vec::new(),
+            candidate_moves: Vec::new(),
         };
 
         for _ in 0..DEFAULT_MAX_COMPANY_COUNT {
@@ -102,7 +104,9 @@ impl StarLanes {
             return;
         }
 
-        self.state = GetMoves;
+        self.candidate_moves.clear();
+
+        self.state = Move;
     }
 
     pub fn next_player(&mut self) {
@@ -163,12 +167,19 @@ impl StarLanes {
     }
 
     pub fn get_moves(&mut self) -> Vec<Point> {
-        if self.state != GetMoves {
+        if self.state != Move {
             panic!("get_moves: invalid state: {:#?}", self.state);
         }
 
-        // Loop through map getting candidate moves
         let mut candidates: Vec<Point> = Vec::new();
+
+        // If we've already generated the moves this turn, just return them
+        if !self.candidate_moves.is_empty() {
+            candidates.extend(self.candidate_moves.iter().cloned());
+            return candidates;
+        }
+
+        // Loop through map getting candidate moves
 
         for (r, row) in self.map.data.iter().enumerate() {
             for (c, mapcell) in row.iter().enumerate() {
@@ -193,13 +204,31 @@ impl StarLanes {
 
         candidates.shuffle(&mut rng);
 
+        // Check if not enough legal moves remaining on board--
+        // this would cause an early game-over.
         if candidates.len() < CANDIDATE_MOVE_COUNT {
             candidates.truncate(0);
             self.state = GameOver;
-        } else {
-            candidates.truncate(CANDIDATE_MOVE_COUNT);
+            return candidates;
         }
 
+        candidates.truncate(CANDIDATE_MOVE_COUNT);
+
+        // Keep a copy for us to use later
+        self.candidate_moves.extend(candidates.iter().cloned());
+
         candidates
+    }
+
+    pub fn make_move(&mut self, move_idx: usize) {
+        if self.state != Move {
+            panic!("move: invalid state: {:#?}", self.state);
+        }
+
+        if !(0..self.candidate_moves.len()).contains(&move_idx) {
+            panic!("move: index out of range: {move_idx}");
+        }
+
+        // TODO beef up neighbor_count to get us the info we need.
     }
 }
