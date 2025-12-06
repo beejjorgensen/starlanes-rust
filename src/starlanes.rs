@@ -16,6 +16,7 @@ enum GameState {
     PreInit,
     BeginTurn,
     Move,
+    EndTurn,
     GameOver,
 }
 
@@ -102,18 +103,9 @@ impl StarLanes {
             panic!("begin_turn: invalid state: {:#?}", self.state);
         }
 
-        if self.turn >= MAX_TURNS {
-            self.state = GameOver;
-            return;
-        }
-
         self.candidate_moves.clear();
 
         self.state = Move;
-    }
-
-    pub fn next_player(&mut self) {
-        self.current_player = (self.current_player + 1) % self.player_count;
     }
 
     fn neighbor_count(&self, at_row: usize, at_col: usize) -> NeighborCounts {
@@ -241,5 +233,22 @@ impl StarLanes {
         if neighbors.only_space {
             self.map.set(row, col, MapCell::Outpost);
         }
+
+        self.state = EndTurn;
+    }
+
+    pub fn end_turn(&mut self) {
+        if self.state != EndTurn {
+            panic!("move: invalid state: {:#?}", self.state);
+        }
+
+        if self.turn >= MAX_TURNS {
+            self.state = GameOver;
+            return;
+        }
+
+        self.current_player = (self.current_player + 1) % self.player_count;
+
+        self.state = BeginTurn;
     }
 }

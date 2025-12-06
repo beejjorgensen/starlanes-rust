@@ -222,15 +222,19 @@ fn main() {
 
     go_first_message(&game, &names);
 
-    ui::display_map(&game.map);
+    loop {
+        ui::display_map(&game.map);
 
-    game.begin_turn();
+        game.begin_turn();
 
-    let candidates = game.get_moves();
+        let candidates = game.get_moves();
 
-    let move_point = get_move(&game, &names[game.get_current_player()], &candidates);
+        let move_point = get_move(&game, &names[game.get_current_player()], &candidates);
 
-    //println!("{:#?}", move_point);
+        //println!("{:#?}", move_point);
 
-    game.make_move(move_point);
+        game.make_move(move_point);
+
+        game.end_turn();
+    }
 }
