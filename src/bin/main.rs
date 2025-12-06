@@ -230,8 +230,7 @@ fn main() {
 
     let move_point = get_move(&game, &names[game.get_current_player()], &candidates);
 
-    println!("{:#?}", move_point);
+    //println!("{:#?}", move_point);
 
-    //for c in candidates { print!("[{},{}] ", c.0, c.1); }
-    //println!();
+    game.make_move(move_point);
 }

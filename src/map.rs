@@ -1,6 +1,6 @@
 use rand::Rng;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub enum MapCell {
     Space,
     Outpost,
@@ -69,5 +69,13 @@ impl Map {
 
             self.data.push(row);
         }
+    }
+
+    pub fn set(&mut self, r: usize, c: usize, v: MapCell) {
+        if r >= self.height || c >= self.width {
+            panic!("map.set: coordinates out of range: {r},{c}");
+        }
+
+        self.data[r][c] = v;
     }
 }

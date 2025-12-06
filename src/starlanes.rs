@@ -42,10 +42,13 @@ impl Default for StarLanes {
     }
 }
 
+#[derive(Debug)]
 struct NeighborCounts {
+    spaces: usize,
     stars: usize,
     outposts: usize,
     companies: usize,
+    only_space: bool,
 }
 
 impl StarLanes {
@@ -115,37 +118,36 @@ impl StarLanes {
 
     fn neighbor_count(&self, at_row: usize, at_col: usize) -> NeighborCounts {
         let mut result = NeighborCounts {
+            spaces: 0,
             stars: 0,
             outposts: 0,
             companies: 0,
+            only_space: false,
         };
 
-        for roffset in [-1i32, 0, 1] {
+        let offsets: [[i32; 2]; 4] = [[0, -1], [-1, 0], [0, 1], [1, 0]];
+
+        for [roffset, coffset] in offsets {
             let row = at_row as i32 + roffset;
+            let col = at_col as i32 + coffset;
 
             if row < 0 || row >= self.map.height as i32 {
                 continue;
             }
 
-            for coffset in [-1i32, 0, 1] {
-                if roffset == 0 && coffset == 0 {
-                    continue;
-                }
+            if col < 0 || col >= self.map.width as i32 {
+                continue;
+            }
 
-                let col = at_col as i32 + coffset;
-
-                if col < 0 || col >= self.map.width as i32 {
-                    continue;
-                }
-
-                match self.map.data[row as usize][col as usize] {
-                    MapCell::Star => result.stars += 1,
-                    MapCell::Outpost => result.outposts += 1,
-                    MapCell::Company(_) => result.companies += 1,
-                    _ => (),
-                }
+            match self.map.data[row as usize][col as usize] {
+                MapCell::Space => result.spaces += 1,
+                MapCell::Star => result.stars += 1,
+                MapCell::Outpost => result.outposts += 1,
+                MapCell::Company(_) => result.companies += 1,
             }
         }
+
+        result.only_space = result.stars == 0 && result.outposts == 0 && result.companies == 0;
 
         result
     }
@@ -230,5 +232,14 @@ impl StarLanes {
         }
 
         // TODO beef up neighbor_count to get us the info we need.
+        let Point(row, col) = move_point;
+
+        let neighbors = self.neighbor_count(row, col);
+
+        // println!("{:#?}", neighbors);
+
+        if neighbors.only_space {
+            self.map.set(row, col, MapCell::Outpost);
+        }
     }
 }
