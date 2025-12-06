@@ -220,13 +220,13 @@ impl StarLanes {
         candidates
     }
 
-    pub fn make_move(&mut self, move_idx: usize) {
+    pub fn make_move(&mut self, move_point: Point) {
         if self.state != Move {
             panic!("move: invalid state: {:#?}", self.state);
         }
 
-        if !(0..self.candidate_moves.len()).contains(&move_idx) {
-            panic!("move: index out of range: {move_idx}");
+        if !self.candidate_moves.contains(&move_point) {
+            panic!("move: invalid move: {:?}", move_point);
         }
 
         // TODO beef up neighbor_count to get us the info we need.

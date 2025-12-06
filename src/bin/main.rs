@@ -132,7 +132,7 @@ fn go_first_message(game: &StarLanes, names: &[String]) {
     println!("{} IS THE FIRST PLAYER TO MOVE.\n", names[current_player]);
 }
 
-fn get_move(game: &StarLanes, name: &str, candidates: &[Point]) -> usize {
+fn get_move(game: &StarLanes, name: &str, candidates: &[Point]) -> Point {
     // There is a bug in the original source where the name wasn't printed
     // again if a 'M'ap or 'S'tocks were requested. This horrid thing
     // recreates that bug.
@@ -196,8 +196,10 @@ fn get_move(game: &StarLanes, name: &str, candidates: &[Point]) -> usize {
             }
         };
 
-        if let Some(i) = candidates.iter().position(|p| *p == Point(selrow, selcol)) {
-            return i;
+        let selpoint = Point(selrow, selcol);
+
+        if candidates.contains(&selpoint) {
+            return selpoint;
         }
 
         show_error = true;
@@ -226,12 +228,9 @@ fn main() {
 
     let candidates = game.get_moves();
 
-    let candidate_index = get_move(&game, &names[game.get_current_player()], &candidates);
+    let move_point = get_move(&game, &names[game.get_current_player()], &candidates);
 
-    println!(
-        "{} [{},{}]",
-        candidate_index, candidates[candidate_index].0, candidates[candidate_index].1
-    );
+    println!("{:#?}", move_point);
 
     //for c in candidates { print!("[{},{}] ", c.0, c.1); }
     //println!();
