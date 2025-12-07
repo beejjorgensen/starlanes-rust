@@ -2,6 +2,10 @@ use starlanes::starlanes::{Point, StarLanes};
 
 mod ui;
 
+struct GameOptions {
+    wizard: bool,
+}
+
 /// Print the game title
 fn print_title() {
     ui::formfeed();
@@ -132,7 +136,7 @@ fn go_first_message(game: &StarLanes, names: &[String]) {
     println!("{} IS THE FIRST PLAYER TO MOVE.\n", names[current_player]);
 }
 
-fn get_move(game: &StarLanes, name: &str, candidates: &[Point]) -> Point {
+fn get_move(game: &StarLanes, name: &str, candidates: &[Point], wizard_mode: bool) -> Point {
     // There is a bug in the original source where the name wasn't printed
     // again if a 'M'ap or 'S'tocks were requested. This horrid thing
     // recreates that bug.
@@ -198,7 +202,7 @@ fn get_move(game: &StarLanes, name: &str, candidates: &[Point]) -> Point {
 
         let selpoint = Point(selrow, selcol);
 
-        if candidates.contains(&selpoint) {
+        if wizard_mode || candidates.contains(&selpoint) {
             return selpoint;
         }
 
@@ -206,15 +210,40 @@ fn get_move(game: &StarLanes, name: &str, candidates: &[Point]) -> Point {
     }
 }
 
+/// Parse the command line
+fn parse_command_line() -> Option<GameOptions> {
+    let mut options = GameOptions { wizard: false };
+
+    for a in std::env::args().skip(1) {
+        match a.as_str() {
+            "--wizard" | "-w" => {
+                options.wizard = true;
+            }
+            _ => {
+                return None;
+            }
+        }
+    }
+
+    Some(options)
+}
+
 /// Main
 fn main() {
     let mut game = StarLanes::new();
+
+    let options = if let Some(options) = parse_command_line() {
+        options
+    } else {
+        eprintln!("usage: starlanes [-w|--wizard]");
+        std::process::exit(1);
+    };
 
     print_title();
 
     let player_count = get_player_count();
 
-    game.init(player_count);
+    game.init(player_count, options.wizard);
 
     instructions();
 
@@ -223,13 +252,24 @@ fn main() {
     go_first_message(&game, &names);
 
     loop {
+        if options.wizard {
+            println!("\n*******************");
+            println!("*** WIZARD MODE ***");
+            println!("*******************\n");
+        }
+
         ui::display_map(&game.map);
 
         game.begin_turn();
 
         let candidates = game.get_moves();
 
-        let move_point = get_move(&game, &names[game.get_current_player()], &candidates);
+        let move_point = get_move(
+            &game,
+            &names[game.get_current_player()],
+            &candidates,
+            options.wizard,
+        );
 
         //println!("{:#?}", move_point);
 

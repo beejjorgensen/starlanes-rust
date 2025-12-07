@@ -36,6 +36,8 @@ pub struct StarLanes {
     max_company_count: usize,
     companies: Vec<Company>,
     candidate_moves: Vec<Point>,
+
+    wizard_mode: bool,
 }
 
 impl Default for StarLanes {
@@ -67,6 +69,7 @@ impl StarLanes {
             max_company_count: DEFAULT_MAX_COMPANY_COUNT,
             companies: Vec::new(),
             candidate_moves: Vec::new(),
+            wizard_mode: false,
         };
 
         for _ in 0..DEFAULT_MAX_COMPANY_COUNT {
@@ -76,7 +79,9 @@ impl StarLanes {
         result
     }
 
-    pub fn init(&mut self, player_count: usize) {
+    pub fn init(&mut self, player_count: usize, wizard: bool) {
+        self.wizard_mode = wizard;
+
         let mut rng = rand::rng();
 
         if !(1..=4).contains(&player_count) {
@@ -228,7 +233,7 @@ impl StarLanes {
             panic!("move: invalid state: {:#?}", self.state);
         }
 
-        if !self.candidate_moves.contains(&move_point) {
+        if !self.wizard_mode && !self.candidate_moves.contains(&move_point) {
             panic!("move: invalid move: {:?}", move_point);
         }
 
