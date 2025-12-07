@@ -159,7 +159,7 @@ impl StarLanes {
         result.only_space =
             result.stars == 0 && result.outposts.is_empty() && result.companies.is_empty();
         result.only_stars_outposts =
-            (result.stars > 0 || result.outposts.is_empty()) && result.companies.is_empty();
+            (result.stars > 0 || !result.outposts.is_empty()) && result.companies.is_empty();
 
         result
     }
@@ -205,7 +205,7 @@ impl StarLanes {
 
                 if !self.companies_available()
                     && neighbors.companies.is_empty()
-                    && (neighbors.outposts.is_empty() || neighbors.stars > 0)
+                    && (!neighbors.outposts.is_empty() || neighbors.stars > 0)
                 {
                     continue;
                 }
