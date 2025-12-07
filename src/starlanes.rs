@@ -3,6 +3,7 @@ use crate::map::{Map, MapCell};
 use crate::player::Player;
 use rand::Rng;
 use rand::prelude::SliceRandom;
+use std::collections::HashMap;
 
 const MAX_TURNS: usize = 48;
 const DEFAULT_MAX_COMPANY_COUNT: usize = 5;
@@ -49,6 +50,7 @@ struct NeighborCounts {
     stars: usize,
     outposts: usize,
     companies: usize,
+    discrete_companies: usize,
     only_space: bool,
 }
 
@@ -114,10 +116,13 @@ impl StarLanes {
             stars: 0,
             outposts: 0,
             companies: 0,
+            discrete_companies: 0,
             only_space: false,
         };
 
         let offsets: [[i32; 2]; 4] = [[0, -1], [-1, 0], [0, 1], [1, 0]];
+
+        let mut company_count: HashMap<MapCell, usize> = HashMap::new();
 
         for [roffset, coffset] in offsets {
             let row = at_row as i32 + roffset;
@@ -135,10 +140,14 @@ impl StarLanes {
                 MapCell::Space => result.spaces += 1,
                 MapCell::Star => result.stars += 1,
                 MapCell::Outpost => result.outposts += 1,
-                MapCell::Company(_) => result.companies += 1,
+                MapCell::Company(i) => {
+                    *company_count.entry(MapCell::Company(i)).or_insert(0) += 1;
+                    result.companies += 1;
+                }
             }
         }
 
+        result.discrete_companies = company_count.len();
         result.only_space = result.stars == 0 && result.outposts == 0 && result.companies == 0;
 
         result
