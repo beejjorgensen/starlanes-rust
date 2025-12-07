@@ -291,7 +291,6 @@ impl StarLanes {
             panic!("move: invalid move: {:?}", move_point);
         }
 
-        // TODO beef up neighbor_count to get us the info we need.
         let Point(row, col) = move_point;
 
         let neighbors = self.neighbor_count(row, col);
@@ -303,17 +302,22 @@ impl StarLanes {
         // } else if neighbors.discrete_companies > 1 {
         //  TODO merge
         } else if neighbors.discrete_companies == 1 {
-            let Point(row, col) = neighbors.companies.first().unwrap();
-            let cell = self.map.get(*row, *col);
-            let co_num = match cell {
-                MapCell::Company(n) => n,
-                _ => panic!("expected to find a company at {},{}", *row, *col),
-            } as usize;
+            let Some(&Point(row, col)) = neighbors.companies.first() else {
+                panic!("expected there to be neighbor companies");
+            };
+
+            let MapCell::Company(n) = self.map.get(row, col) else {
+                panic!("expected to find a company at {},{}", row, col);
+            };
+
+            let co_num = n as usize;
+
             self.grow_company(co_num);
             self.tidy_company(co_num, move_point, &neighbors);
         } else if neighbors.only_stars_outposts {
             let co_num = self.form_company();
             self.tidy_company(co_num, move_point, &neighbors);
+
             events.push(Event::CompanyFormed(co_num));
         }
 
