@@ -1,3 +1,4 @@
+use starlanes::event::Event;
 use starlanes::starlanes::{Point, StarLanes};
 
 mod ui;
@@ -262,7 +263,15 @@ impl UserInterface {
 
             //println!("{:#?}", move_point);
 
-            self.game.make_move(move_point);
+            let events = self.game.make_move(move_point);
+
+            for event in &events {
+                match event {
+                    Event::CompanyFormed(c) => {
+                        println!("Company {c} formed!");
+                    }
+                }
+            }
 
             self.game.end_turn();
         }

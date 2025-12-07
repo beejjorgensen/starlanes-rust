@@ -1,4 +1,5 @@
 use crate::company::Company;
+use crate::event::Event;
 use crate::map::{Map, MapCell};
 use crate::player::Player;
 use rand::Rng;
@@ -54,6 +55,7 @@ struct NeighborCounts {
     companies: usize,
     discrete_companies: usize,
     only_space: bool,
+    only_stars_outposts: bool,
 }
 
 impl StarLanes {
@@ -123,6 +125,7 @@ impl StarLanes {
             companies: 0,
             discrete_companies: 0,
             only_space: false,
+            only_stars_outposts: false,
         };
 
         let offsets: [[i32; 2]; 4] = [[0, -1], [-1, 0], [0, 1], [1, 0]];
@@ -154,6 +157,8 @@ impl StarLanes {
 
         result.discrete_companies = company_count.len();
         result.only_space = result.stars == 0 && result.outposts == 0 && result.companies == 0;
+        result.only_stars_outposts =
+            (result.stars > 0 || result.outposts > 0) && result.companies == 0;
 
         result
     }
@@ -228,7 +233,9 @@ impl StarLanes {
         candidates
     }
 
-    pub fn make_move(&mut self, move_point: Point) {
+    pub fn make_move(&mut self, move_point: Point) -> Vec<Event> {
+        let mut events: Vec<Event> = Vec::new();
+
         if self.state != Move {
             panic!("move: invalid state: {:#?}", self.state);
         }
@@ -246,9 +253,15 @@ impl StarLanes {
 
         if neighbors.only_space {
             self.map.set(row, col, MapCell::Outpost);
+        } else if neighbors.only_stars_outposts {
+            //let co_num = self.form_company(move_point);
+            //self.tidy_company(move_point);
+            events.push(Event::CompanyFormed(/*co_num*/ 0));
         }
 
         self.state = EndTurn;
+
+        events
     }
 
     pub fn end_turn(&mut self) {
