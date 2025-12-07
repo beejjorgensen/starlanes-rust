@@ -251,6 +251,17 @@ impl StarLanes {
         co_num
     }
 
+    fn tidy_company(&mut self, co_num: usize, move_point: Point) {
+        // TODO: add to company value per star
+        // TODO: add to company value per outpost
+        // TODO: add outposts to company
+        // TODO: check stock split
+
+        let Point(row, col) = move_point;
+
+        self.map.set(row, col, MapCell::Company(co_num as u32));
+    }
+
     pub fn make_move(&mut self, move_point: Point) -> Vec<Event> {
         let mut events: Vec<Event> = Vec::new();
 
@@ -273,7 +284,7 @@ impl StarLanes {
             self.map.set(row, col, MapCell::Outpost);
         } else if neighbors.only_stars_outposts {
             let co_num = self.form_company();
-            //self.tidy_company(move_point);
+            self.tidy_company(co_num, move_point);
             events.push(Event::CompanyFormed(co_num));
         }
 
