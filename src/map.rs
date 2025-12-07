@@ -78,4 +78,12 @@ impl Map {
 
         self.data[r][c] = v;
     }
+
+    pub fn get(&mut self, r: usize, c: usize) -> MapCell {
+        if r >= self.height || c >= self.width {
+            panic!("map.set: coordinates out of range: {r},{c}");
+        }
+
+        self.data[r][c]
+    }
 }

@@ -52,7 +52,7 @@ struct NeighborCounts {
     spaces: usize,
     stars: usize,
     outposts: Vec<Point>,
-    companies: usize,
+    companies: Vec<Point>,
     discrete_companies: usize,
     only_space: bool,
     only_stars_outposts: bool,
@@ -122,7 +122,7 @@ impl StarLanes {
             spaces: 0,
             stars: 0,
             outposts: Vec::new(),
-            companies: 0,
+            companies: Vec::new(),
             discrete_companies: 0,
             only_space: false,
             only_stars_outposts: false,
@@ -150,16 +150,16 @@ impl StarLanes {
                 MapCell::Outpost => result.outposts.push(Point(row as usize, col as usize)),
                 MapCell::Company(i) => {
                     *company_count.entry(MapCell::Company(i)).or_insert(0) += 1;
-                    result.companies += 1;
+                    result.companies.push(Point(row as usize, col as usize));
                 }
             }
         }
 
         result.discrete_companies = company_count.len();
         result.only_space =
-            result.stars == 0 && result.outposts.is_empty() && result.companies == 0;
+            result.stars == 0 && result.outposts.is_empty() && result.companies.is_empty();
         result.only_stars_outposts =
-            (result.stars > 0 || result.outposts.is_empty()) && result.companies == 0;
+            (result.stars > 0 || result.outposts.is_empty()) && result.companies.is_empty();
 
         result
     }
@@ -204,7 +204,7 @@ impl StarLanes {
                 let neighbors = self.neighbor_count(r, c);
 
                 if !self.companies_available()
-                    && neighbors.companies == 0
+                    && neighbors.companies.is_empty()
                     && (neighbors.outposts.is_empty() || neighbors.stars > 0)
                 {
                     continue;
@@ -256,6 +256,13 @@ impl StarLanes {
         co_num
     }
 
+    fn grow_company(&mut self, co_num: usize) {
+        let company = &mut self.companies[co_num];
+
+        company.size += 1;
+        company.share_price += 100;
+    }
+
     fn tidy_company(&mut self, co_num: usize, move_point: Point, neighbors: &NeighborCounts) {
         let company = &mut self.companies[co_num];
 
@@ -293,6 +300,17 @@ impl StarLanes {
 
         if neighbors.only_space {
             self.map.set(row, col, MapCell::Outpost);
+        // } else if neighbors.discrete_companies > 1 {
+        //  TODO merge
+        } else if neighbors.discrete_companies == 1 {
+            let Point(row, col) = neighbors.companies.first().unwrap();
+            let cell = self.map.get(*row, *col);
+            let co_num = match cell {
+                MapCell::Company(n) => n,
+                _ => panic!("expected to find a company at {},{}", *row, *col),
+            } as usize;
+            self.grow_company(co_num);
+            self.tidy_company(co_num, move_point, &neighbors);
         } else if neighbors.only_stars_outposts {
             let co_num = self.form_company();
             self.tidy_company(co_num, move_point, &neighbors);
