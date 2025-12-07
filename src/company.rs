@@ -1,7 +1,7 @@
 #[derive(Debug)]
 pub struct Company {
     pub in_use: bool,
-    //size: usize,
+    pub size: usize,
     //share_price: usize,
 }
 
@@ -9,7 +9,7 @@ impl Company {
     pub fn new() -> Self {
         Company {
             in_use: false,
-            //size: 0,
+            size: 0,
             //share_price: 100,
         }
     }

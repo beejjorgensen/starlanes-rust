@@ -233,6 +233,24 @@ impl StarLanes {
         candidates
     }
 
+    fn form_company(&mut self) -> usize {
+        let company_opt = self
+            .companies
+            .iter_mut()
+            .enumerate()
+            .find(|(_, c)| !c.in_use);
+
+        let (co_num, company) =
+            company_opt.expect("trying to form a company but all companies are in use!");
+
+        company.in_use = true;
+        company.size = 1;
+
+        // TODO: award 5 stock to current player
+
+        co_num
+    }
+
     pub fn make_move(&mut self, move_point: Point) -> Vec<Event> {
         let mut events: Vec<Event> = Vec::new();
 
@@ -254,9 +272,9 @@ impl StarLanes {
         if neighbors.only_space {
             self.map.set(row, col, MapCell::Outpost);
         } else if neighbors.only_stars_outposts {
-            //let co_num = self.form_company(move_point);
+            let co_num = self.form_company();
             //self.tidy_company(move_point);
-            events.push(Event::CompanyFormed(/*co_num*/ 0));
+            events.push(Event::CompanyFormed(co_num));
         }
 
         self.state = EndTurn;
