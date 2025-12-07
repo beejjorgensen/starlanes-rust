@@ -1,7 +1,7 @@
 #[derive(Debug)]
 pub struct Player {
-    holdings: Vec<u64>,
-    cash: u64,
+    pub holdings: Vec<u64>,
+    pub cash: u64,
 }
 
 impl Player {

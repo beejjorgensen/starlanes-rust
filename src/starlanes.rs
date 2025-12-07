@@ -247,6 +247,13 @@ impl StarLanes {
         company.size = 1;
 
         // TODO: award 5 stock to current player
+        for (i, p) in self.players.iter_mut().enumerate() {
+            p.holdings[co_num] = if i == self.current_player {
+                5
+            } else {
+                0
+            };
+        }
 
         co_num
     }
