@@ -51,7 +51,7 @@ impl Default for StarLanes {
 struct NeighborCounts {
     spaces: usize,
     stars: usize,
-    outposts: usize,
+    outposts: Vec<Point>,
     companies: usize,
     discrete_companies: usize,
     only_space: bool,
@@ -121,7 +121,7 @@ impl StarLanes {
         let mut result = NeighborCounts {
             spaces: 0,
             stars: 0,
-            outposts: 0,
+            outposts: Vec::new(),
             companies: 0,
             discrete_companies: 0,
             only_space: false,
@@ -147,7 +147,7 @@ impl StarLanes {
             match self.map.data[row as usize][col as usize] {
                 MapCell::Space => result.spaces += 1,
                 MapCell::Star => result.stars += 1,
-                MapCell::Outpost => result.outposts += 1,
+                MapCell::Outpost => result.outposts.push(Point(row as usize, col as usize)),
                 MapCell::Company(i) => {
                     *company_count.entry(MapCell::Company(i)).or_insert(0) += 1;
                     result.companies += 1;
@@ -156,9 +156,10 @@ impl StarLanes {
         }
 
         result.discrete_companies = company_count.len();
-        result.only_space = result.stars == 0 && result.outposts == 0 && result.companies == 0;
+        result.only_space =
+            result.stars == 0 && result.outposts.is_empty() && result.companies == 0;
         result.only_stars_outposts =
-            (result.stars > 0 || result.outposts > 0) && result.companies == 0;
+            (result.stars > 0 || result.outposts.is_empty()) && result.companies == 0;
 
         result
     }
@@ -204,7 +205,7 @@ impl StarLanes {
 
                 if !self.companies_available()
                     && neighbors.companies == 0
-                    && (neighbors.outposts > 0 || neighbors.stars > 0)
+                    && (neighbors.outposts.is_empty() || neighbors.stars > 0)
                 {
                     continue;
                 }
@@ -245,28 +246,31 @@ impl StarLanes {
 
         company.in_use = true;
         company.size = 1;
+        company.share_price = 100;
 
-        // TODO: award 5 stock to current player
+        // Award 5 stock to founding player
         for (i, p) in self.players.iter_mut().enumerate() {
-            p.holdings[co_num] = if i == self.current_player {
-                5
-            } else {
-                0
-            };
+            p.holdings[co_num] = if i == self.current_player { 5 } else { 0 };
         }
 
         co_num
     }
 
-    fn tidy_company(&mut self, co_num: usize, move_point: Point) {
-        // TODO: add to company value per star
-        // TODO: add to company value per outpost
-        // TODO: add outposts to company
-        // TODO: check stock split
+    fn tidy_company(&mut self, co_num: usize, move_point: Point, neighbors: &NeighborCounts) {
+        let company = &mut self.companies[co_num];
+
+        company.share_price += 500 * neighbors.stars;
+
+        company.share_price += 100 * neighbors.outposts.len();
+        for Point(row, col) in &neighbors.outposts {
+            self.map.set(*row, *col, MapCell::Company(co_num as u32));
+        }
 
         let Point(row, col) = move_point;
 
         self.map.set(row, col, MapCell::Company(co_num as u32));
+
+        // TODO: check stock split
     }
 
     pub fn make_move(&mut self, move_point: Point) -> Vec<Event> {
@@ -291,7 +295,7 @@ impl StarLanes {
             self.map.set(row, col, MapCell::Outpost);
         } else if neighbors.only_stars_outposts {
             let co_num = self.form_company();
-            self.tidy_company(co_num, move_point);
+            self.tidy_company(co_num, move_point, &neighbors);
             events.push(Event::CompanyFormed(co_num));
         }
 

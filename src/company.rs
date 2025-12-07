@@ -2,7 +2,7 @@
 pub struct Company {
     pub in_use: bool,
     pub size: usize,
-    //share_price: usize,
+    pub share_price: usize,
 }
 
 impl Company {
@@ -10,7 +10,7 @@ impl Company {
         Company {
             in_use: false,
             size: 0,
-            //share_price: 100,
+            share_price: 100,
         }
     }
 }
