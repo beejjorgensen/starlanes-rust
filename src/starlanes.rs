@@ -10,6 +10,10 @@ const MAX_TURNS: usize = 48;
 const DEFAULT_MAX_COMPANY_COUNT: usize = 5;
 const CANDIDATE_MOVE_COUNT: usize = 5;
 
+const DEFAULT_STAR_PRICE_BOOST: usize = 500;
+const DEFAULT_GROWTH_PRICE_BOOST: usize = 100;
+const DEFAULT_OUTPOST_PRICE_BOOST: usize = 100;
+
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct Point(pub usize, pub usize);
 
@@ -246,7 +250,7 @@ impl StarLanes {
 
         company.in_use = true;
         company.size = 1;
-        company.share_price = 100;
+        company.share_price = DEFAULT_GROWTH_PRICE_BOOST;
 
         // Award 5 stock to founding player
         for (i, p) in self.players.iter_mut().enumerate() {
@@ -260,15 +264,15 @@ impl StarLanes {
         let company = &mut self.companies[co_num];
 
         company.size += 1;
-        company.share_price += 100;
+        company.share_price += DEFAULT_GROWTH_PRICE_BOOST;
     }
 
     fn tidy_company(&mut self, co_num: usize, move_point: Point, neighbors: &NeighborCounts) {
         let company = &mut self.companies[co_num];
 
-        company.share_price += 500 * neighbors.stars;
+        company.share_price += DEFAULT_STAR_PRICE_BOOST * neighbors.stars;
 
-        company.share_price += 100 * neighbors.outposts.len();
+        company.share_price += DEFAULT_OUTPOST_PRICE_BOOST * neighbors.outposts.len();
         for Point(row, col) in &neighbors.outposts {
             self.map.set(*row, *col, MapCell::Company(co_num as u32));
         }
