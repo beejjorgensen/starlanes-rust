@@ -1,7 +1,7 @@
 #[derive(Debug)]
 pub struct Dividend {
     pub company: usize,
-    pub amount: usize,
+    pub amount: u64,
 }
 
 pub enum Event {

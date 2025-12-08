@@ -10,9 +10,9 @@ const MAX_TURNS: usize = 48;
 const DEFAULT_MAX_COMPANY_COUNT: usize = 5;
 const CANDIDATE_MOVE_COUNT: usize = 5;
 
-const DEFAULT_STAR_PRICE_BOOST: usize = 500;
-const DEFAULT_GROWTH_PRICE_BOOST: usize = 100;
-const DEFAULT_OUTPOST_PRICE_BOOST: usize = 100;
+const DEFAULT_STAR_PRICE_BOOST: u64 = 500;
+const DEFAULT_GROWTH_PRICE_BOOST: u64 = 100;
+const DEFAULT_OUTPOST_PRICE_BOOST: u64 = 100;
 const DEFAULT_DIVIDEND_PERCENTAGE: f32 = 5.0; // percent
 
 #[derive(Debug, PartialEq, Copy, Clone)]
@@ -279,9 +279,9 @@ impl StarLanes {
     fn tidy_company(&mut self, co_num: usize, move_point: Point, neighbors: &NeighborCounts) {
         let company = &mut self.companies[co_num];
 
-        company.share_price += DEFAULT_STAR_PRICE_BOOST * neighbors.stars;
+        company.share_price += DEFAULT_STAR_PRICE_BOOST * neighbors.stars as u64;
 
-        company.share_price += DEFAULT_OUTPOST_PRICE_BOOST * neighbors.outposts.len();
+        company.share_price += DEFAULT_OUTPOST_PRICE_BOOST * neighbors.outposts.len() as u64;
         for Point(row, col) in &neighbors.outposts {
             self.map.set(*row, *col, MapCell::Company(co_num as u32));
         }
@@ -305,14 +305,14 @@ impl StarLanes {
             let amount = (DEFAULT_DIVIDEND_PERCENTAGE / 100.0
                 * c.share_price as f32
                 * player.holdings[idx] as f32)
-                .round();
+                .round() as u64;
 
             dividends.push(Dividend {
                 company: idx,
-                amount: amount as usize,
+                amount,
             });
 
-            player.cash += amount as u64;
+            player.cash += amount;
         }
 
         if !dividends.is_empty() {

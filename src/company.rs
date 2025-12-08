@@ -1,8 +1,8 @@
 #[derive(Debug)]
 pub struct Company {
     pub in_use: bool,
-    pub size: usize,
-    pub share_price: usize,
+    pub size: u64,
+    pub share_price: u64,
 }
 
 impl Company {
