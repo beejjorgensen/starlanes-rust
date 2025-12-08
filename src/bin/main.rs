@@ -184,6 +184,12 @@ impl UserInterface {
                     println!("A NEW SHIPPING COMPANY HAS BEEN FORMED!");
                     println!("IT'S NAME IS {}", COMPANY_NAMES[*c]);
                 }
+
+                Event::Dividends(_) => {
+                    // Original game didn't display any UI for receiving
+                    // dividends
+                    //println("Dividends:\n{:#?}", d);
+                }
             }
         }
     }

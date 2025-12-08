@@ -1,5 +1,5 @@
 use crate::company::Company;
-use crate::event::Event;
+use crate::event::{Dividend, Event};
 use crate::map::{Map, MapCell};
 use crate::player::Player;
 use rand::Rng;
@@ -13,6 +13,7 @@ const CANDIDATE_MOVE_COUNT: usize = 5;
 const DEFAULT_STAR_PRICE_BOOST: usize = 500;
 const DEFAULT_GROWTH_PRICE_BOOST: usize = 100;
 const DEFAULT_OUTPOST_PRICE_BOOST: usize = 100;
+const DEFAULT_DIVIDEND_PERCENTAGE: f32 = 5.0; // percent
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct Point(pub usize, pub usize);
@@ -284,6 +285,33 @@ impl StarLanes {
         // TODO: check stock split
     }
 
+    fn dividends(&mut self, events: &mut Vec<Event>) {
+        let mut dividends: Vec<Dividend> = Vec::new();
+        let player = &mut self.players[self.current_player];
+
+        for (idx, c) in self.companies.iter().enumerate() {
+            if !c.in_use {
+                continue;
+            }
+
+            let amount = (DEFAULT_DIVIDEND_PERCENTAGE / 100.0
+                * c.share_price as f32
+                * player.holdings[idx] as f32)
+                .round();
+
+            dividends.push(Dividend {
+                company: idx,
+                amount: amount as usize,
+            });
+
+            player.cash += amount as u64;
+        }
+
+        if !dividends.is_empty() {
+            events.push(Event::Dividends(dividends));
+        }
+    }
+
     pub fn make_move(&mut self, move_point: Point) -> Vec<Event> {
         let mut events: Vec<Event> = Vec::new();
 
@@ -326,6 +354,8 @@ impl StarLanes {
         }
 
         self.state = EndTurn;
+
+        self.dividends(&mut events);
 
         events
     }
