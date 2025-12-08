@@ -76,7 +76,7 @@ impl UserInterface {
     fn go_first_message(&self) {
         println!("\nNOW I WILL DECIDED WHO GOES FIRST...\n"); // DECIDED sic
 
-        let current_player = self.game.get_current_player();
+        let current_player = self.game.get_current_player_index();
 
         println!(
             "{} IS THE FIRST PLAYER TO MOVE.\n",
@@ -91,7 +91,7 @@ impl UserInterface {
         let mut bug_first = true;
         let mut show_error = false;
 
-        let name = &self.names[self.game.get_current_player()];
+        let name = &self.names[self.game.get_current_player_index()];
 
         loop {
             if show_error {
@@ -122,6 +122,16 @@ impl UserInterface {
             if input.starts_with('M') {
                 println!();
                 ui::display_map(&self.game.map);
+                continue;
+            }
+
+            if input.starts_with('S') {
+                println!();
+                ui::show_holdings(
+                    self.game.get_current_player(),
+                    self.game.get_companies(),
+                    &COMPANY_NAMES,
+                );
                 continue;
             }
 

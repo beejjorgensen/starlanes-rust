@@ -108,8 +108,16 @@ impl StarLanes {
         self.state = BeginTurn;
     }
 
-    pub fn get_current_player(&self) -> usize {
+    pub fn get_current_player_index(&self) -> usize {
         self.current_player
+    }
+
+    pub fn get_current_player(&self) -> &Player {
+        &self.players[self.current_player]
+    }
+
+    pub fn get_companies(&self) -> &Vec<Company> {
+        &self.companies
     }
 
     pub fn begin_turn(&mut self) {
