@@ -10,6 +10,9 @@ pub fn formfeed() {
 ///
 /// This simulates the BASIC `TAB` function. Effectively it prints n-1
 /// spaces so the the next character will be in the nth column.
+///
+/// WARNING: This function only works for the first tab--it doesn't actually
+/// do any position tracking at all.
 pub fn tab(n: usize) -> String {
     format!("{:>width$}", "", width = n - 1)
 }
