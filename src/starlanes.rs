@@ -157,7 +157,7 @@ impl StarLanes {
                 continue;
             }
 
-            match self.map.data[row as usize][col as usize] {
+            match self.map.get(row as usize, col as usize) {
                 MapCell::Space => result.spaces += 1,
                 MapCell::Star => result.stars += 1,
                 MapCell::Outpost => result.outposts.push(Point(row as usize, col as usize)),
@@ -208,9 +208,11 @@ impl StarLanes {
 
         // Loop through map getting candidate moves
 
-        for (r, row) in self.map.data.iter().enumerate() {
-            for (c, mapcell) in row.iter().enumerate() {
-                if *mapcell != MapCell::Space {
+        for r in 0..self.map.height {
+            for c in 0..self.map.width {
+                let mapcell = self.map.get(r, c);
+
+                if mapcell != MapCell::Space {
                     continue;
                 }
 

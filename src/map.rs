@@ -24,7 +24,7 @@ pub struct Map {
 
     /// The [`MapCell`]s themselves.
     /// [`MapCell`]: MapCell
-    pub data: Vec<Vec<MapCell>>,
+    data: Vec<Vec<MapCell>>,
 
     /// The probability of there being a star in a particular cell.
     star_probability: f32,
@@ -92,7 +92,7 @@ impl Map {
         self.data[r][c] = v;
     }
 
-    pub fn get(&mut self, r: usize, c: usize) -> MapCell {
+    pub fn get(&self, r: usize, c: usize) -> MapCell {
         if r >= self.height || c >= self.width {
             panic!("map.set: coordinates out of range: {r},{c}");
         }

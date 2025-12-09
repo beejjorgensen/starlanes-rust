@@ -17,15 +17,18 @@ pub fn display_map(m: &Map) {
     println!("{}*******************", ui::tab(21));
     println!("{} A  B  C  D  E  F  G  H  I  J  K  L", ui::tab(12));
 
-    for (i, row) in m.data.iter().enumerate() {
-        print!("{} {} ", ui::tab(9), i + 1);
-        for cell in row {
+    for r in 0..m.height {
+        print!("{} {} ", ui::tab(9), r + 1);
+        for c in 0..m.width {
+            let cell = m.get(r, c);
+
             let character = match cell {
                 Space => '.',
                 Outpost => '+',
                 Star => '*',
-                Company(id) => company_to_char(*id),
+                Company(id) => company_to_char(id),
             };
+
             print!(" {character} ");
         }
         println!();
