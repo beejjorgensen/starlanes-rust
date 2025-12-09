@@ -14,6 +14,7 @@ const DEFAULT_STAR_PRICE_BOOST: u64 = 500;
 const DEFAULT_GROWTH_PRICE_BOOST: u64 = 100;
 const DEFAULT_OUTPOST_PRICE_BOOST: u64 = 100;
 const DEFAULT_DIVIDEND_PERCENTAGE: f32 = 5.0; // percent
+const DEFAULT_FOUNDER_SHARES: u64 = 5;
 
 #[derive(Debug, PartialEq)]
 enum GameState {
@@ -99,7 +100,7 @@ impl StarLanes {
         self.current_player = rng.random_range(0..self.player_count);
 
         for _ in 0..player_count {
-            self.players.push(Player::new(self.max_company_count));
+            self.players.push(Player::new());
         }
 
         self.state = BeginTurn;
@@ -260,9 +261,15 @@ impl StarLanes {
         company.size = 1;
         company.share_price = DEFAULT_GROWTH_PRICE_BOOST;
 
-        // Award 5 stock to founding player
+        // Set all player holdings to 0, except the founding player.
         for (i, p) in self.players.iter_mut().enumerate() {
-            p.holdings[co_num] = if i == self.current_player { 5 } else { 0 };
+            // Award shares to founding player
+            let holdings = if i == self.current_player {
+                DEFAULT_FOUNDER_SHARES
+            } else {
+                0
+            };
+            p.set_holdings(co_num, holdings);
         }
 
         co_num
@@ -303,7 +310,7 @@ impl StarLanes {
 
             let amount = (DEFAULT_DIVIDEND_PERCENTAGE / 100.0
                 * c.share_price as f32
-                * player.holdings[idx] as f32)
+                * player.get_holdings(idx) as f32)
                 .round() as u64;
 
             dividends.push(Dividend {

@@ -16,7 +16,7 @@ pub fn show_holdings(player: &Player, companies: &[Company]) {
             "{:<29}{:<19}{}",
             ui::COMPANY_NAMES[i],
             c.share_price,
-            player.holdings[i]
+            player.get_holdings(i)
         );
     }
 }
