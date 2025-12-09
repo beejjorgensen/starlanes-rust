@@ -1,7 +1,8 @@
 //! Main game running code
 
 use starlanes::event::Event;
-use starlanes::starlanes::{Point, StarLanes};
+use starlanes::map::Point;
+use starlanes::starlanes::StarLanes;
 
 mod ui;
 

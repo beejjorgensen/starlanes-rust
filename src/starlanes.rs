@@ -1,6 +1,6 @@
 use crate::company::Company;
 use crate::event::{Dividend, Event};
-use crate::map::{Map, MapCell};
+use crate::map::{Map, MapCell, Point};
 use crate::player::Player;
 use rand::Rng;
 use rand::prelude::SliceRandom;
@@ -14,9 +14,6 @@ const DEFAULT_STAR_PRICE_BOOST: u64 = 500;
 const DEFAULT_GROWTH_PRICE_BOOST: u64 = 100;
 const DEFAULT_OUTPOST_PRICE_BOOST: u64 = 100;
 const DEFAULT_DIVIDEND_PERCENTAGE: f32 = 5.0; // percent
-
-#[derive(Debug, PartialEq, Copy, Clone)]
-pub struct Point(pub usize, pub usize);
 
 #[derive(Debug, PartialEq)]
 enum GameState {

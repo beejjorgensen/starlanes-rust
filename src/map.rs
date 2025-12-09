@@ -8,6 +8,10 @@
 
 use rand::Rng;
 
+/// A row, column point on the map.
+#[derive(Debug, PartialEq, Copy, Clone)]
+pub struct Point(pub usize, pub usize);
+
 /// All the things that can appear in a map cell.
 #[derive(Debug, Eq, Hash, PartialEq, Copy, Clone)]
 pub enum MapCell {
