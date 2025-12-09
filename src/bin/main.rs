@@ -189,34 +189,21 @@ impl UserInterface {
     /// Main game loop
     pub fn game_loop(&mut self) {
         ui::print_title();
-
         self.get_player_count();
-
         self.game.init(self.player_count, self.wizard_mode);
-
         self.instructions();
-
         self.get_player_names();
-
         self.go_first_message();
 
         loop {
             self.wizard_alert();
-
             ui::display_map(&self.game.map);
-
             self.game.begin_turn();
-
             let candidates = self.game.get_moves();
-
             let move_point = self.get_move(&candidates);
-
             let events = self.game.make_move(move_point);
-
             self.handle_events(events);
-
             self.trade();
-
             self.game.end_turn();
         }
     }
