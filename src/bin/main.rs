@@ -1,3 +1,5 @@
+//! Main game running code
+
 use starlanes::event::Event;
 use starlanes::starlanes::{Point, StarLanes};
 
@@ -8,6 +10,7 @@ struct UserInterfaceOptions {
     wizard_mode: bool,
 }
 
+/// General information for displaying and running the UI
 struct UserInterface {
     wizard_mode: bool,
     player_count: usize,
@@ -70,6 +73,7 @@ impl UserInterface {
         );
     }
 
+    /// Have the user select a move from a group of candidates
     fn get_move(&self, candidates: &[Point]) -> Point {
         // There is a bug in the original source where the name wasn't printed
         // again if a 'M'ap or 'S'tocks were requested. This horrid thing
@@ -149,6 +153,11 @@ impl UserInterface {
         }
     }
 
+    /// Trade stocks
+    fn trade(&mut self) {
+        // TODO
+    }
+
     /// Narc on wizards
     fn wizard_alert(&self) {
         if self.wizard_mode {
@@ -204,6 +213,8 @@ impl UserInterface {
             let events = self.game.make_move(move_point);
 
             self.handle_events(events);
+
+            self.trade();
 
             self.game.end_turn();
         }
