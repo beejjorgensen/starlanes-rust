@@ -1,3 +1,24 @@
+//! This is the main game module.
+//!
+//! An external UI driver will run through the following steps.
+//!
+//! 1. Create a new [`StarLanes`] object.
+//! 2. Call [`init`] on that object.
+//! 3. Call [`begin_turn`].
+//! 4. Call [`get_moves`].
+//! 5. Call [`make_move`].
+//! 6. Call [`end_turn`].
+//! 7. `GOTO` step 3.
+//!
+//! After [`get_moves`] or [`end_turn`], the UI should check if the game
+//! is over and act accordingly.
+//!
+//! [`init`]: StarLanes::init
+//! [`begin_turn`]: StarLanes::init
+//! [`get_moves`]: StarLanes::get_moves
+//! [`make_move`]: StarLanes::make_move
+//! [`end_turn`]: StarLanes::end_turn
+
 use crate::company::Company;
 use crate::event::{Dividend, Event};
 use crate::map::{Map, MapCell, Point};
@@ -16,60 +37,117 @@ const DEFAULT_OUTPOST_PRICE_BOOST: u64 = 100;
 const DEFAULT_DIVIDEND_PERCENTAGE: f32 = 5.0; // percent
 const DEFAULT_FOUNDER_SHARES: u64 = 5;
 
+/// Game state representation. The game state is moved by calling
+/// various methods.
 #[derive(Debug, PartialEq)]
 enum GameState {
+    /// Before the game has begun. Game is ready for an
+    /// [`StarLanes::init`] call.
     PreInit,
+
+    /// Player is beginning their turn. Game is ready for a
+    /// [`StarLanes::begin_turn`] call.
     BeginTurn,
+
+    /// Player is moving. Game is ready for [`StarLanes::get_moves`] and
+    /// [`StarLanes::make_move`] calls.
     Move,
+
+    /// Player has completed their turn. Game is ready for an
+    /// [`StarLanes::end_turn`] call.
     EndTurn,
+
+    /// Game is over.
     GameOver,
 }
 
 use GameState::*;
 
+/// Main game structure.
 #[derive(Debug)]
 pub struct StarLanes {
+    /// The game map.
     pub map: Map,
 
-    turn_count: usize,
-    turn: usize,
+    /// Current game turn count. When it reaches a limit, the game is
+    /// over.
+    turn_number: usize,
+
+    /// Current game state.
     state: GameState,
+
+    /// Number of players in the game.
     player_count: usize,
+
+    /// Current player's number.
     current_player: usize,
+
+    /// List of player information in the game.
     players: Vec<Player>,
+
+    /// The maximum number of companies that can exist in this game.
     max_company_count: usize,
+
+    /// A list of companies, both extant and not.
     companies: Vec<Company>,
+
+    /// Potential moves the current player can make this turn.
     candidate_moves: Vec<Point>,
 
+    /// Removes some game restrictions for play-testing purposes.
     wizard_mode: bool,
 }
 
 impl Default for StarLanes {
+    /// Creates a new default game.
     fn default() -> Self {
         Self::new()
     }
 }
 
+/// Information about the neighbors of a particular map cell. This is
+/// used when coming up with candidate moves and determining the results
+/// of a particular player move.
+///
+/// Neighbors are orthogonal from the given spot. Out-of-bounds cells
+/// are not considered.
 #[derive(Debug)]
 struct NeighborCounts {
+    /// How many neighbors are empty space.
     spaces: usize,
+
+    /// How many neighbors are stars.
     stars: usize,
+
+    /// A coordinate list of neighboring unaffiliated outposts.
     outposts: Vec<Point>,
+
+    /// A coordinate list of neighboring companies.
     companies: Vec<Point>,
+
+    /// How many different companies are neighbors.
     discrete_companies: usize,
+
+    /// True if there is only empty space around the cell.
     only_space: bool,
+
+    /// True if there are only stars, outposts, or empty space around
+    /// the cell.
     only_stars_outposts: bool,
 }
 
 impl StarLanes {
+    /// Create a new partially-initialized game object. See [`init`] for
+    /// completing initialization.
+    ///
+    /// [`init`]: Self::init
     pub fn new() -> Self {
         let mut result = StarLanes {
             map: Map::new(),
             state: PreInit,
             player_count: 0,
             current_player: 0,
-            turn_count: 0,
-            turn: 0,
+            turn_number: 0,
             players: Vec::new(),
             max_company_count: DEFAULT_MAX_COMPANY_COUNT,
             companies: Vec::new(),
@@ -84,7 +162,14 @@ impl StarLanes {
         result
     }
 
+    /// Initialize the game object for a given player count (determined
+    /// by the UI code). If `wizard` is `true`, game runs in Wizard
+    /// Mode (debugging).
     pub fn init(&mut self, player_count: usize, wizard: bool) {
+        if self.state != PreInit {
+            panic!("init: invalid state: {:#?}", self.state);
+        }
+
         self.wizard_mode = wizard;
 
         let mut rng = rand::rng();
@@ -93,7 +178,7 @@ impl StarLanes {
             panic!("invalid player count");
         }
 
-        self.turn_count = 0;
+        self.turn_number = 0;
 
         self.player_count = player_count;
 
@@ -106,18 +191,22 @@ impl StarLanes {
         self.state = BeginTurn;
     }
 
+    /// Returns the index of the current player.
     pub fn get_current_player_index(&self) -> usize {
         self.current_player
     }
 
+    /// Returns a reference to the current player object.
     pub fn get_current_player(&self) -> &Player {
         &self.players[self.current_player]
     }
 
+    /// Returns a reference to all the companies.
     pub fn get_companies(&self) -> &Vec<Company> {
         &self.companies
     }
 
+    /// Start the turn. This should be called from the UI
     pub fn begin_turn(&mut self) {
         if self.state != BeginTurn {
             panic!("begin_turn: invalid state: {:#?}", self.state);
@@ -128,6 +217,7 @@ impl StarLanes {
         self.state = Move;
     }
 
+    /// Assess the neighbors of a particular location on the map.
     fn neighbor_count(&self, at_row: usize, at_col: usize) -> NeighborCounts {
         let mut result = NeighborCounts {
             spaces: 0,
@@ -175,6 +265,8 @@ impl StarLanes {
         result
     }
 
+    /// Return the number of companies that are currently active in the
+    /// game.
     fn active_company_count(&self) -> usize {
         let mut count: usize = 0;
 
@@ -187,10 +279,28 @@ impl StarLanes {
         count
     }
 
+    /// Return true if there are inactive companies available to be
+    /// formed.
     fn companies_available(&self) -> bool {
         self.active_company_count() < self.max_company_count
     }
 
+    /// Return true if the game is over.
+    pub fn game_is_over(&self) -> bool {
+        self.state == GameOver
+    }
+
+    /// Get the candidate moves for a particular player.
+    ///
+    /// In the standard game, it's incredibly probable that there will
+    /// be enough moves available (i.e. there aren't too many filled
+    /// spots to find enough valid moves).
+    ///
+    /// **However**, if enough candidate moves cannot be found, the game
+    /// will be over. This must be checked by the UI via
+    /// [`game_is_over`].
+    ///
+    /// [`game_is_over`]: Self::game_is_over
     pub fn get_moves(&mut self) -> Vec<Point> {
         if self.state != Move {
             panic!("get_moves: invalid state: {:#?}", self.state);
@@ -247,6 +357,8 @@ impl StarLanes {
         candidates
     }
 
+    /// Form and initialize a new company. This function assumes there
+    /// are companies available.
     fn form_company(&mut self) -> usize {
         let company_opt = self
             .companies
@@ -275,6 +387,7 @@ impl StarLanes {
         co_num
     }
 
+    /// Grow a particular company by one space.
     fn grow_company(&mut self, co_num: usize) {
         let company = &mut self.companies[co_num];
 
@@ -282,6 +395,15 @@ impl StarLanes {
         company.share_price += DEFAULT_GROWTH_PRICE_BOOST;
     }
 
+    /// Do cleanup after forming or growing a company.
+    ///
+    /// This figures out the stock price increases due to neighboring
+    /// stars, and absorbs nearby outposts.
+    ///
+    /// It also checks if a stock split occurs.
+    ///
+    /// This should **not** be called if there was a merge; merging
+    /// handles its own cleanup.
     fn tidy_company(&mut self, co_num: usize, move_point: Point, neighbors: &NeighborCounts) {
         let company = &mut self.companies[co_num];
 
@@ -299,6 +421,11 @@ impl StarLanes {
         // TODO: check stock split
     }
 
+    /// Computes the dividents for the current player.
+    ///
+    /// This also adds an [`Event`] describing the [`Dividend`] per
+    /// company that the UI can use to display the info. (The original
+    /// game did not display anything.)
     fn dividends(&mut self, events: &mut Vec<Event>) {
         let mut dividends: Vec<Dividend> = Vec::new();
         let player = &mut self.players[self.current_player];
@@ -327,8 +454,6 @@ impl StarLanes {
     }
 
     pub fn make_move(&mut self, move_point: Point) -> Vec<Event> {
-        let mut events: Vec<Event> = Vec::new();
-
         if self.state != Move {
             panic!("move: invalid state: {:#?}", self.state);
         }
@@ -336,6 +461,8 @@ impl StarLanes {
         if !self.wizard_mode && !self.candidate_moves.contains(&move_point) {
             panic!("move: invalid move: {:?}", move_point);
         }
+
+        let mut events: Vec<Event> = Vec::new();
 
         let Point(row, col) = move_point;
 
@@ -379,7 +506,7 @@ impl StarLanes {
             panic!("move: invalid state: {:#?}", self.state);
         }
 
-        if self.turn >= MAX_TURNS {
+        if self.turn_number >= MAX_TURNS {
             self.state = GameOver;
             return;
         }
