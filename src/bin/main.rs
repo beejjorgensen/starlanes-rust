@@ -3,14 +3,6 @@ use starlanes::starlanes::{Point, StarLanes};
 
 mod ui;
 
-const COMPANY_NAMES: [&str; 5] = [
-    "ALTAIR STARWAYS",
-    "BETELGEUSE, LTD.",
-    "CAPELLA FREIGHT CO.",
-    "DENEBOLA SHIPPERS",
-    "ERIDANI EXPEDITERS",
-];
-
 /// Command line options
 struct UserInterfaceOptions {
     wizard_mode: bool,
@@ -125,11 +117,7 @@ impl UserInterface {
             }
 
             if input.starts_with('S') {
-                ui::show_holdings(
-                    self.game.get_current_player(),
-                    self.game.get_companies(),
-                    &COMPANY_NAMES,
-                );
+                ui::show_holdings(self.game.get_current_player(), self.game.get_companies());
                 continue;
             }
 
@@ -190,7 +178,7 @@ impl UserInterface {
                     Self::special_announcement();
 
                     println!("A NEW SHIPPING COMPANY HAS BEEN FORMED!");
-                    println!("IT'S NAME IS {}", COMPANY_NAMES[*c]);
+                    println!("IT'S NAME IS {}", ui::COMPANY_NAMES[*c]);
                 }
 
                 Event::Dividends(_) => {

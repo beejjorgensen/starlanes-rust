@@ -3,7 +3,7 @@ use starlanes::player::Player;
 
 use crate::ui;
 
-pub fn show_holdings(player: &Player, companies: &[Company], names: &[&str]) {
+pub fn show_holdings(player: &Player, companies: &[Company]) {
     ui::formfeed();
     println!("\n\n{:<29}{:<19}YOUR HOLDINGS", "STOCK", "PRICE PER SHARE");
 
@@ -14,7 +14,9 @@ pub fn show_holdings(player: &Player, companies: &[Company], names: &[&str]) {
 
         println!(
             "{:<29}{:<19}{}",
-            names[i], c.share_price, player.holdings[i]
+            ui::COMPANY_NAMES[i],
+            c.share_price,
+            player.holdings[i]
         );
     }
 }

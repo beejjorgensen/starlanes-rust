@@ -1,0 +1,7 @@
+pub const COMPANY_NAMES: [&str; 5] = [
+    "ALTAIR STARWAYS",
+    "BETELGEUSE, LTD.",
+    "CAPELLA FREIGHT CO.",
+    "DENEBOLA SHIPPERS",
+    "ERIDANI EXPEDITERS",
+];
