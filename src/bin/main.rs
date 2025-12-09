@@ -120,13 +120,11 @@ impl UserInterface {
             }
 
             if input.starts_with('M') {
-                println!();
                 ui::display_map(&self.game.map);
                 continue;
             }
 
             if input.starts_with('S') {
-                println!();
                 ui::show_holdings(
                     self.game.get_current_player(),
                     self.game.get_companies(),

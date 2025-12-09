@@ -13,7 +13,7 @@ fn company_to_char(id: u32) -> char {
 pub fn display_map(m: &Map) {
     ui::formfeed();
 
-    println!("{}MAP OF THE GALAXY", ui::tab(22));
+    println!("\n{}MAP OF THE GALAXY", ui::tab(22));
     println!("{}*******************", ui::tab(21));
     println!("{} A  B  C  D  E  F  G  H  I  J  K  L", ui::tab(12));
 
