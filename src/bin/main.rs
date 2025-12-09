@@ -43,7 +43,7 @@ impl UserInterface {
         }
     }
 
-    /// Get the player names.
+    /// Get the player names
     fn get_player_names(&mut self) {
         self.names.clear();
 
@@ -53,17 +53,20 @@ impl UserInterface {
         }
     }
 
+    /// Return the current player name
+    fn get_current_player_name(&self) -> &String {
+        &self.names[self.game.get_current_player_index()]
+    }
+
     /// Print out who goes first
     ///
     /// The game has already decided this, so it's just informational.
     fn go_first_message(&self) {
         println!("\nNOW I WILL DECIDED WHO GOES FIRST...\n"); // DECIDED sic
 
-        let current_player = self.game.get_current_player_index();
-
         println!(
             "{} IS THE FIRST PLAYER TO MOVE.\n",
-            self.names[current_player]
+            self.get_current_player_name()
         );
     }
 
@@ -74,7 +77,7 @@ impl UserInterface {
         let mut bug_first = true;
         let mut show_error = false;
 
-        let name = &self.names[self.game.get_current_player_index()];
+        let name = self.get_current_player_name();
 
         loop {
             if show_error {
