@@ -26,15 +26,6 @@ impl UserInterface {
         }
     }
 
-    /// Print the game title
-    fn print_title(&self) {
-        ui::formfeed();
-        println!(
-            "\n\n\n{}* S * T * A * R ** L * A * N * E * S *",
-            ui::tab(10)
-        );
-    }
-
     /// Prompt for and get the player count
     fn get_player_count(&mut self) {
         print!("HOW MANY PLAYERS (2-4)");
@@ -155,12 +146,6 @@ impl UserInterface {
         }
     }
 
-    /// Special Announcement
-    fn special_announcement() {
-        print!("\x07"); // bell
-        println!("{}SPECIAL ANNOUNCEMENT!!\n", ui::tab(22));
-    }
-
     /// Narc on wizards
     fn wizard_alert(&self) {
         if self.wizard_mode {
@@ -175,10 +160,8 @@ impl UserInterface {
         for event in &events {
             match event {
                 Event::CompanyFormed(c) => {
-                    Self::special_announcement();
-
-                    println!("A NEW SHIPPING COMPANY HAS BEEN FORMED!");
-                    println!("IT'S NAME IS {}", ui::COMPANY_NAMES[*c]);
+                    ui::special_announcement();
+                    ui::company_formed(*c);
                 }
 
                 Event::Dividends(_) => {
@@ -192,7 +175,7 @@ impl UserInterface {
 
     /// Main game loop
     pub fn game_loop(&mut self) {
-        self.print_title();
+        ui::print_title();
 
         self.get_player_count();
 
