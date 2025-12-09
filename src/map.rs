@@ -1,3 +1,10 @@
+//! The game map.
+//!
+//! Each [`Map`] is a grid of [`MapCell`]s.
+//!
+//! [`Map`]: Map
+//! [`MapCell`]: MapCell
+
 use rand::Rng;
 
 #[derive(Debug, Eq, Hash, PartialEq, Copy, Clone)]
@@ -10,10 +17,16 @@ pub enum MapCell {
 
 #[derive(Debug)]
 pub struct Map {
+    /// The width of the map in cells.
     pub width: usize,
+    /// The height of the map in cells.
     pub height: usize,
+
+    /// The [`MapCell`]s themselves.
+    /// [`MapCell`]: MapCell
     pub data: Vec<Vec<MapCell>>,
 
+    /// The probability of there being a star in a particular cell.
     star_probability: f32,
 }
 
