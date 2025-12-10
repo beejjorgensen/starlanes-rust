@@ -38,8 +38,35 @@ FOR 2-4 PLAYERS - COPYRIGHT 1977 BY STEVEN FABER
 WRITTEN IN ALTAIR BASIC 12/17/76
 ```
 
+## TODO
+
+### For reimplementation
+
+* Fix the UI-in-main/UI-in-ui dichotomy
+* Trading
+* Merging
+* Stock Splits
+* Game over
+* Pass config object to `StarLanes` constructor
+
+### Additional features
+
+* Any-order trading
+* General standings page (was this in the Osborne version and not the
+  original?)
+* Black holes
+* Variable map sizes
+* More companies
+* Tunable parameters (all those `const`s)
+
+### Later, in other packages
+
+* [Ratatui](https://crates.io/crates/ratatui) front-end
+* Web front-end for a WASM build
+
 ## Author
 
 Brian "Beej Jorgensen" Hall\
 [beej.us](https://beej.us/)\
 [beej@beej.us](mailto:beej@beej.us)
+
