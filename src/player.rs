@@ -52,6 +52,17 @@ impl Player {
         self.holdings[company_idx] = holdings;
     }
 
+    /// Change player holdings in a particular company.
+    pub fn change_holdings(&mut self, company_idx: usize, delta: i64) {
+        let required_size = company_idx + 1;
+
+        if self.holdings.len() < required_size {
+            self.holdings.resize(required_size, 0);
+        }
+
+        self.holdings[company_idx] = holdings;
+    }
+
     /// Reset a player to starting conditions.
     pub fn reset(&mut self) {
         self.holdings.clear();

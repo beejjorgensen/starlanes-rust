@@ -56,6 +56,11 @@ enum GameState {
     /// [`StarLanes::make_move`] calls.
     Move,
 
+    /// Player is trading in a specific company. The original game only
+    /// allowed you to trade companies in order,.
+    /// [`StarLanes::trade`] call.
+    Trade(usize),
+
     /// Player has completed their turn. Game is ready for an
     /// [`StarLanes::end_turn`] call.
     EndTurn,
@@ -501,11 +506,62 @@ impl StarLanes {
             events.push(Event::CompanyFormed(co_num));
         }
 
-        self.state = EndTurn;
+        self.state = self.get_next_trade_state(0);
 
         self.dividends(&mut events);
 
         events
+    }
+
+    /// Return the next company Trade state from the current one. This
+    /// is for the classic game which only allowed you to trade stocks
+    /// in alphabetical order.
+    fn get_next_trade_state(&self, from: usize) -> GameState {
+        for (i, c) in self.companies.iter().enumerate() {
+            if i >= from && c.in_use {
+                return Trade(i);
+            }
+        }
+
+        EndTurn
+    }
+
+    /// Trade stock in a particular company. `amount` is the number of
+    /// shares, negative to sell.
+    pub fn trade(&mut self, co_num: usize, amount: i64) {
+        if self.state != Trade(co_num) {
+            panic!("trade: invalid state for trading company {}: {:#?}", co_num, self.state);
+        }
+        
+        let player = self.get_current_player();
+
+        if amount < 0 && amount.abs() as u64 > player.cash {
+            panic!("trade: selling more stock than held");
+        }
+
+        let cost: i64 = amount * self.companies[co_num].share_price as i64;
+        
+        if cost > 0 && cost > player.cash as i64 {
+            panic!("trade: buying more stock than cash allows");
+        }
+
+        player.holdings[co_num] += amount;
+        player.cash += cost;
+        
+        self.state = self.get_next_trade_state(co_num);
+
+        TODO
+
+        /*
+        fn apply_delta(value: u64, delta: i64) -> u64 {
+        if delta >= 0 {
+            value.saturating_add(delta as u64)
+        } else {
+            value.saturating_sub((-delta) as u64)
+        }
+        */
+}
+
     }
 
     /// Called to wrap up the current player's turn.
