@@ -1,3 +1,6 @@
+//! Instructions UI.
+
+/// Print the instructions.
 pub fn show_instructions() {
     println!("\n   STAR LANES IS A GAME OF INTERSTELLAR TRADING.");
     println!("THE OBJECT OF THE GAME IS TO AMASS THE GREATEST AMOUNT");

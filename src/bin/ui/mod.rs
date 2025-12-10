@@ -1,3 +1,4 @@
+//! Various bits of UI code.
 mod basicio;
 mod company;
 mod holdings;

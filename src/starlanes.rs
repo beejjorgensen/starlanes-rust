@@ -6,16 +6,19 @@
 //! 2. Call [`init`] on that object.
 //! 3. Call [`begin_turn`].
 //! 4. Call [`get_moves`].
-//! 5. Call [`make_move`].
-//! 6. Call [`end_turn`].
-//! 7. `GOTO` step 3.
+//! 5. Test [`game_is_over`].
+//! 6. Call [`make_move`].
+//! 7. Call [`end_turn`].
+//! 8. Test [`game_is_over`].
+//! 9. `GOTO` step 3.
 //!
 //! After [`get_moves`] or [`end_turn`], the UI should check if the game
 //! is over and act accordingly.
 //!
 //! [`init`]: StarLanes::init
-//! [`begin_turn`]: StarLanes::init
+//! [`begin_turn`]: StarLanes::begin_turn
 //! [`get_moves`]: StarLanes::get_moves
+//! [`game_is_over`]: StarLanes::game_is_over
 //! [`make_move`]: StarLanes::make_move
 //! [`end_turn`]: StarLanes::end_turn
 
@@ -206,7 +209,7 @@ impl StarLanes {
         &self.companies
     }
 
-    /// Start the turn. This should be called from the UI
+    /// Start the turn. This should be called from the UI.
     pub fn begin_turn(&mut self) {
         if self.state != BeginTurn {
             panic!("begin_turn: invalid state: {:#?}", self.state);
@@ -453,6 +456,10 @@ impl StarLanes {
         }
     }
 
+    /// Called by the player to make their move at a given point. This
+    /// is validated against the move list to make sure the move is
+    /// valid unless [wizard mode has been set](Self::init). If wizard mode is set,
+    /// this will panic if a move is made off the map.
     pub fn make_move(&mut self, move_point: Point) -> Vec<Event> {
         if self.state != Move {
             panic!("move: invalid state: {:#?}", self.state);
@@ -501,6 +508,7 @@ impl StarLanes {
         events
     }
 
+    /// Called to wrap up the current player's turn.
     pub fn end_turn(&mut self) {
         if self.state != EndTurn {
             panic!("move: invalid state: {:#?}", self.state);

@@ -1,8 +1,10 @@
+//! Show holdings UI.
 use starlanes::company::Company;
 use starlanes::player::Player;
 
 use crate::ui;
 
+/// Show the holdings of the given player.
 pub fn show_holdings(player: &Player, companies: &[Company]) {
     ui::formfeed();
     println!("\n\n{:<29}{:<19}YOUR HOLDINGS", "STOCK", "PRICE PER SHARE");

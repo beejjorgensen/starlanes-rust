@@ -1,3 +1,5 @@
+//! Miscellaneous UI functions.
+
 use crate::ui;
 
 /// Print the game title

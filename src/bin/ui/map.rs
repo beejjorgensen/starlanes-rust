@@ -1,11 +1,11 @@
-//! Map-related UI functionality
+//! Map-related UI functionality.
 
 use starlanes::map::Map;
 use starlanes::map::MapCell::*;
 
 use crate::ui;
 
-/// Map a company number to a map character
+/// Map a company number to a map character.
 fn company_to_char(id: u32) -> char {
     match id {
         0..5 => (b'A' + id as u8) as char,
@@ -13,7 +13,7 @@ fn company_to_char(id: u32) -> char {
     }
 }
 
-/// Display the map
+/// Display the map.
 pub fn display_map(m: &Map) {
     ui::formfeed();
 

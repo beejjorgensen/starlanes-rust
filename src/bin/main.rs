@@ -1,4 +1,4 @@
-//! Main game running code
+//! Main game running code.
 
 use starlanes::event::Event;
 use starlanes::map::Point;
@@ -6,12 +6,12 @@ use starlanes::starlanes::StarLanes;
 
 mod ui;
 
-/// Command line options
+/// Command line options.
 struct UserInterfaceOptions {
     wizard_mode: bool,
 }
 
-/// General information for displaying and running the UI
+/// General information for displaying and running the UI.
 struct UserInterface {
     wizard_mode: bool,
     player_count: usize,
@@ -20,7 +20,7 @@ struct UserInterface {
 }
 
 impl UserInterface {
-    /// Create a new UserInterface
+    /// Create a new UserInterface.
     fn new(opts: UserInterfaceOptions) -> Self {
         Self {
             wizard_mode: opts.wizard_mode,
@@ -30,14 +30,14 @@ impl UserInterface {
         }
     }
 
-    /// Prompt for and get the player count
+    /// Prompt for and get the player count.
     fn get_player_count(&mut self) {
         print!("HOW MANY PLAYERS (2-4)");
         let count = ui::input();
         self.player_count = count.parse().unwrap()
     }
 
-    /// Prompt for and display instructions
+    /// Prompt for and display instructions.
     fn instructions(&self) {
         print!("DOES ANY PLAYER NEED INSTRUCTIONS");
         let yn = ui::input();
@@ -47,7 +47,7 @@ impl UserInterface {
         }
     }
 
-    /// Get the player names
+    /// Get the player names.
     fn get_player_names(&mut self) {
         self.names.clear();
 
@@ -57,12 +57,12 @@ impl UserInterface {
         }
     }
 
-    /// Return the current player name
+    /// Return the current player name.
     fn get_current_player_name(&self) -> &String {
         &self.names[self.game.get_current_player_index()]
     }
 
-    /// Print out who goes first
+    /// Print out who goes first.
     ///
     /// The game has already decided this, so it's just informational.
     fn go_first_message(&self) {
@@ -74,7 +74,7 @@ impl UserInterface {
         );
     }
 
-    /// Have the user select a move from a group of candidates
+    /// Have the user select a move from a group of candidates.
     fn get_move(&self, candidates: &[Point]) -> Point {
         // There is a bug in the original source where the name wasn't printed
         // again if a 'M'ap or 'S'tocks were requested. This horrid thing
@@ -154,12 +154,12 @@ impl UserInterface {
         }
     }
 
-    /// Trade stocks
+    /// Trade stocks.
     fn trade(&mut self) {
         // TODO
     }
 
-    /// Narc on wizards
+    /// Narc on wizards.
     fn wizard_alert(&self) {
         if self.wizard_mode {
             println!("\n*******************");
@@ -168,7 +168,7 @@ impl UserInterface {
         }
     }
 
-    /// Loop through post-move events
+    /// Loop through post-move events.
     fn handle_events(&self, events: Vec<Event>) {
         for event in &events {
             match event {
@@ -186,7 +186,7 @@ impl UserInterface {
         }
     }
 
-    /// Main game loop
+    /// Main game loop.
     pub fn game_loop(&mut self) {
         ui::print_title();
         self.get_player_count();
@@ -209,7 +209,7 @@ impl UserInterface {
     }
 }
 
-/// Parse the command line
+/// Parse the command line.
 fn parse_command_line() -> Option<UserInterfaceOptions> {
     let mut options = UserInterfaceOptions { wizard_mode: false };
 
@@ -227,7 +227,7 @@ fn parse_command_line() -> Option<UserInterfaceOptions> {
     Some(options)
 }
 
-/// Main
+/// Main.
 fn main() {
     let options = if let Some(options) = parse_command_line() {
         options

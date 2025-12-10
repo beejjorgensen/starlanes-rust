@@ -1,3 +1,4 @@
+//! I/O functions that tend to ease porting from BASIC.
 use std::io;
 use std::io::Write;
 
