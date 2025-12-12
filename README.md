@@ -45,6 +45,8 @@ WRITTEN IN ALTAIR BASIC 12/17/76
 * Merging
 * Stock Splits
 * Pass config object to `StarLanes` constructor
+  * Bug flags
+  * Everything tuneable
 * Check for other fields that should be private
 
 ### Additional features
