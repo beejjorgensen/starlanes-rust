@@ -40,6 +40,26 @@ const DEFAULT_OUTPOST_PRICE_BOOST: u64 = 100;
 const DEFAULT_DIVIDEND_PERCENTAGE: f32 = 5.0; // percent
 const DEFAULT_FOUNDER_SHARES: u64 = 5;
 
+/// Trade Error. This happens when trying to do bad trades.
+#[derive(Debug)]
+pub enum TradeError {
+    /// Player doesn't have enough cash to buy.
+    TooLittleCash,
+    /// Player doesn't have enough stock to sell.
+    TooLittleStock,
+}
+
+impl std::fmt::Display for TradeError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            TradeError::TooLittleCash => write!(f, "Not enough cash"),
+            TradeError::TooLittleStock => write!(f, "Not enough stock"),
+        }
+    }
+}
+
+impl std::error::Error for TradeError {}
+
 /// Game state representation. The game state is moved by calling
 /// various methods.
 #[derive(Debug, PartialEq)]
@@ -462,7 +482,7 @@ impl StarLanes {
                 amount,
             });
 
-            player.cash += amount;
+            player.add_cash(amount);
         }
 
         if !dividends.is_empty() {
@@ -537,8 +557,9 @@ impl StarLanes {
 
     /// Trade stock in a particular company. `amount` is the number of
     /// shares, negative to sell.
-    pub fn trade(&mut self, co_num: usize, amount: i64) {
-        // The original game didn't check for negative values on the purchase
+    pub fn trade(&mut self, co_num: usize, amount: i64) -> Result<(), TradeError> {
+        // The original game didn't check for negative values on the
+        // purchase. If this is true, this game will not check, either.
         const BUG_OVERSELL: bool = true;
 
         if self.state != Trade(co_num) {
@@ -549,27 +570,31 @@ impl StarLanes {
         }
 
         let player = &mut self.players[self.current_player];
+        let holdings = player.get_holdings(co_num);
+        let cash = player.get_cash();
 
-        if !BUG_OVERSELL && amount < 0 && amount.unsigned_abs() > player.cash {
-            panic!("trade: selling more stock than held");
+        if !BUG_OVERSELL && amount < 0 && amount.unsigned_abs() > holdings {
+            return Err(TradeError::TooLittleStock);
         }
 
         // Is there a safer way to do this?
         let cost: i64 = amount * self.companies[co_num].share_price as i64;
 
-        if cost > 0 && cost > player.cash as i64 {
-            panic!("trade: buying more stock than cash allows");
+        if cost > 0 && cost > cash as i64 {
+            return Err(TradeError::TooLittleCash);
         }
 
-        player.change_holdings(co_num, amount);
-        player.cash = player.cash.saturating_add_signed(cost);
+        player.add_holdings_signed(co_num, amount);
+        player.add_cash_signed(-cost);
 
-        self.state = self.get_next_trade_state(co_num);
+        self.state = self.get_next_trade_state(co_num + 1);
+
+        Ok(())
     }
 
     /// Called to wrap up the current player's turn.
     pub fn end_turn(&mut self) {
-        if !matches!(self.state, Trade(_) /*| FreeTrade*/) {
+        if !matches!(self.state, EndTurn | Trade(_) /*| FreeTrade*/) {
             panic!("end_turn: invalid state: {:#?}", self.state);
         }
 

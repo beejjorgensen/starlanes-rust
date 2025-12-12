@@ -7,7 +7,7 @@ const DEFAULT_CASH: u64 = 6000;
 #[derive(Debug)]
 pub struct Player {
     /// Cash on-hand.
-    pub cash: u64,
+    cash: u64,
 
     /// Holdings in various companies. This is indexed by company number.
     holdings: Vec<u64>,
@@ -30,6 +30,12 @@ impl Player {
             cash: starting_cash,
             starting_cash,
         }
+    }
+
+    /// Reset a player to starting conditions.
+    pub fn reset(&mut self) {
+        self.holdings.clear();
+        self.cash = self.starting_cash;
     }
 
     /// Return holdings in a particular company.
@@ -57,15 +63,31 @@ impl Player {
     }
 
     /// Change player holdings in a particular company.
-    pub fn change_holdings(&mut self, company_idx: usize, delta: i64) {
+    pub fn add_holdings_signed(&mut self, company_idx: usize, delta: i64) {
         self.grow_holdings_vec(company_idx);
         self.holdings[company_idx] = self.holdings[company_idx].saturating_add_signed(delta);
     }
 
-    /// Reset a player to starting conditions.
-    pub fn reset(&mut self) {
-        self.holdings.clear();
-        self.cash = self.starting_cash;
+    /// Return player cash.
+    pub fn get_cash(&self) -> u64 {
+        self.cash
+    }
+
+    /// Set player cash.
+    pub fn set_cash(&mut self, cash: u64) {
+        self.cash = cash;
+    }
+
+    /// Add to player cash.
+    pub fn add_cash(&mut self, delta: u64) -> u64 {
+        self.cash = self.cash.saturating_add(delta);
+        self.cash
+    }
+
+    /// Signed add to player cash.
+    pub fn add_cash_signed(&mut self, delta: i64) -> u64 {
+        self.cash = self.cash.saturating_add_signed(delta);
+        self.cash
     }
 }
 

@@ -2,7 +2,7 @@
 
 use starlanes::event::Event;
 use starlanes::map::Point;
-use starlanes::starlanes::StarLanes;
+use starlanes::starlanes::{StarLanes, TradeError};
 
 mod ui;
 
@@ -156,9 +156,7 @@ impl UserInterface {
 
     /// Trade stocks.
     fn trade(&mut self) {
-        // The original game didn't check for negative values on the purchase
-        const BUG_OVERSELL: bool = true;
-
+        // Get a list of the company numbers that are available to trade.
         let trade_companies: Vec<usize> = self
             .game
             .get_companies()
@@ -174,9 +172,10 @@ impl UserInterface {
 
             let player = self.game.get_current_player();
 
-            println!("YOUR CURRENT CASH= $ {}", player.cash);
-
             let holdings = player.get_holdings(i);
+            let cash = player.get_cash();
+
+            println!("YOUR CURRENT CASH= $ {}", cash);
 
             loop {
                 println!("BUY HOW MANY SHARES OF {} AT $ {}", co_name, share_price);
@@ -195,20 +194,21 @@ impl UserInterface {
 
                 let to_buy = to_buy.parse::<i64>().unwrap_or_default();
 
-                let cost = share_price as i64 * to_buy;
-
-                if cost > 0 {
-                    if cost.unsigned_abs() > player.cash {
-                        println!("YOU ONLY HAVE $ {} - TRY AGAIN", player.cash);
+                match self.game.trade(i, to_buy) {
+                    Err(TradeError::TooLittleCash) => {
+                        println!("YOU ONLY HAVE $ {} - TRY AGAIN", cash);
                         continue;
                     }
-                } else if cost < 0 && !BUG_OVERSELL && to_buy.unsigned_abs() > holdings {
-                    // This does not exist in the original game.
-                    println!("YOU ONLY HAVE {} SHARES - TRY AGAIN", holdings);
-                    continue;
+
+                    Err(TradeError::TooLittleStock) => {
+                        // This does not exist in the original game.
+                        println!("YOU ONLY HAVE {} SHARES - TRY AGAIN", holdings);
+                        continue;
+                    }
+
+                    Ok(_) => (),
                 }
 
-                self.game.trade(i, to_buy);
                 break;
             }
         }
