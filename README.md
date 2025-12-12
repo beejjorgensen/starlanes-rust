@@ -43,11 +43,10 @@ WRITTEN IN ALTAIR BASIC 12/17/76
 ### For reimplementation
 
 * Fix the UI-in-main/UI-in-ui dichotomy
-* Trading
 * Merging
 * Stock Splits
-* Game over
 * Pass config object to `StarLanes` constructor
+* Check for other fields that should be private
 
 ### Additional features
 
