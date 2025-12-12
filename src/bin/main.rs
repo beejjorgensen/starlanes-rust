@@ -156,7 +156,62 @@ impl UserInterface {
 
     /// Trade stocks.
     fn trade(&mut self) {
-        // TODO
+        // The original game didn't check for negative values on the purchase
+        const BUG_OVERSELL: bool = true;
+
+        let trade_companies: Vec<usize> = self
+            .game
+            .get_companies()
+            .iter()
+            .enumerate()
+            .filter_map(|(i, c)| if c.in_use { Some(i) } else { None })
+            .collect();
+
+        // Trade all currently in-use companies, if any.
+        for i in trade_companies {
+            let co_name = ui::company_name(i);
+            let share_price = self.game.get_company(i).share_price;
+
+            let player = self.game.get_current_player();
+
+            println!("YOUR CURRENT CASH= $ {}", player.cash);
+
+            let holdings = player.get_holdings(i);
+
+            loop {
+                println!("BUY HOW MANY SHARES OF {} AT $ {}", co_name, share_price);
+                print!("{}YOU NOW OWN {} ", ui::tab(5), holdings);
+                let to_buy = ui::input();
+
+                if to_buy.starts_with('M') {
+                    ui::display_map(&self.game.map);
+                    continue;
+                }
+
+                if to_buy.starts_with('S') {
+                    ui::show_holdings(self.game.get_current_player(), self.game.get_companies());
+                    continue;
+                }
+
+                let to_buy = to_buy.parse::<i64>().unwrap_or_default();
+
+                let cost = share_price as i64 * to_buy;
+
+                if cost > 0 {
+                    if cost.unsigned_abs() > player.cash {
+                        println!("YOU ONLY HAVE $ {} - TRY AGAIN", player.cash);
+                        continue;
+                    }
+                } else if cost < 0 && !BUG_OVERSELL && to_buy.unsigned_abs() > holdings {
+                    // This does not exist in the original game.
+                    println!("YOU ONLY HAVE {} SHARES - TRY AGAIN", holdings);
+                    continue;
+                }
+
+                self.game.trade(i, to_buy);
+                break;
+            }
+        }
     }
 
     /// Narc on wizards.

@@ -57,9 +57,13 @@ enum GameState {
     Move,
 
     /// Player is trading in a specific company. The original game only
-    /// allowed you to trade companies in order,.
+    /// allowed you to trade companies in order. Game is ready for
     /// [`StarLanes::trade`] call.
     Trade(usize),
+
+    /// Player is trading arbitrary companies in any order. Game is
+    /// ready for [`StarLanes::trade`] call.
+    //FreeTrade,
 
     /// Player has completed their turn. Game is ready for an
     /// [`StarLanes::end_turn`] call.
@@ -207,6 +211,11 @@ impl StarLanes {
     /// Returns a reference to the current player object.
     pub fn get_current_player(&self) -> &Player {
         &self.players[self.current_player]
+    }
+
+    /// Returns a reference to a company.
+    pub fn get_company(&self, co_num: usize) -> &Company {
+        &self.companies[co_num]
     }
 
     /// Returns a reference to all the companies.
@@ -529,6 +538,9 @@ impl StarLanes {
     /// Trade stock in a particular company. `amount` is the number of
     /// shares, negative to sell.
     pub fn trade(&mut self, co_num: usize, amount: i64) {
+        // The original game didn't check for negative values on the purchase
+        const BUG_OVERSELL: bool = true;
+
         if self.state != Trade(co_num) {
             panic!(
                 "trade: invalid state for trading company {}: {:#?}",
@@ -538,7 +550,7 @@ impl StarLanes {
 
         let player = &mut self.players[self.current_player];
 
-        if amount < 0 && amount.unsigned_abs() > player.cash {
+        if !BUG_OVERSELL && amount < 0 && amount.unsigned_abs() > player.cash {
             panic!("trade: selling more stock than held");
         }
 
@@ -557,8 +569,8 @@ impl StarLanes {
 
     /// Called to wrap up the current player's turn.
     pub fn end_turn(&mut self) {
-        if self.state != EndTurn {
-            panic!("move: invalid state: {:#?}", self.state);
+        if !matches!(self.state, Trade(_) /*| FreeTrade*/) {
+            panic!("end_turn: invalid state: {:#?}", self.state);
         }
 
         if self.turn_number >= MAX_TURNS {
