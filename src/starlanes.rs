@@ -228,9 +228,14 @@ impl StarLanes {
         self.current_player
     }
 
+    /// Return a particular player at an index.
+    pub fn get_player(&self, player_num: usize) -> &Player {
+        &self.players[player_num]
+    }
+
     /// Returns a reference to the current player object.
     pub fn get_current_player(&self) -> &Player {
-        &self.players[self.current_player]
+        self.get_player(self.current_player)
     }
 
     /// Returns a reference to a company.
@@ -597,6 +602,8 @@ impl StarLanes {
         if !matches!(self.state, EndTurn | Trade(_) /*| FreeTrade*/) {
             panic!("end_turn: invalid state: {:#?}", self.state);
         }
+
+        self.turn_number += 1;
 
         if self.turn_number >= MAX_TURNS {
             self.state = GameOver;
