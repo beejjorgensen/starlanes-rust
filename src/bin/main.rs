@@ -192,7 +192,7 @@ impl UserInterface {
                     continue;
                 }
 
-                let to_buy = to_buy.parse::<i64>().unwrap_or_default();
+                let to_buy = to_buy.parse::<i64>().unwrap_or(0);
 
                 match self.game.trade(i, to_buy) {
                     Err(TradeError::TooLittleCash) => {

@@ -38,7 +38,7 @@ const DEFAULT_STAR_PRICE_BOOST: u64 = 500;
 const DEFAULT_GROWTH_PRICE_BOOST: u64 = 100;
 const DEFAULT_OUTPOST_PRICE_BOOST: u64 = 100;
 const DEFAULT_DIVIDEND_PERCENTAGE: f32 = 5.0; // percent
-const DEFAULT_FOUNDER_SHARES: u64 = 5;
+const DEFAULT_FOUNDER_SHARES: i64 = 5;
 
 /// Trade Error. This happens when trying to do bad trades.
 #[derive(Debug)]
@@ -573,7 +573,7 @@ impl StarLanes {
         let holdings = player.get_holdings(co_num);
         let cash = player.get_cash();
 
-        if !BUG_OVERSELL && amount < 0 && amount.unsigned_abs() > holdings {
+        if !BUG_OVERSELL && amount < 0 && amount.abs() > holdings {
             return Err(TradeError::TooLittleStock);
         }
 

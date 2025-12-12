@@ -10,7 +10,10 @@ pub struct Player {
     cash: u64,
 
     /// Holdings in various companies. This is indexed by company number.
-    holdings: Vec<u64>,
+    ///
+    /// This really shouldn't be negative ever, but the original game
+    /// had a bug that allowed for that.
+    holdings: Vec<i64>,
 
     /// How much cash the player should start with at the beginning of the
     /// game.
@@ -39,12 +42,8 @@ impl Player {
     }
 
     /// Return holdings in a particular company.
-    pub fn get_holdings(&self, company_idx: usize) -> u64 {
-        if let Some(h) = self.holdings.get(company_idx) {
-            *h
-        } else {
-            0
-        }
+    pub fn get_holdings(&self, company_idx: usize) -> i64 {
+        *self.holdings.get(company_idx).unwrap_or(&0)
     }
 
     /// Helper function to grow the holdings vector if necessary.
@@ -57,7 +56,7 @@ impl Player {
     }
 
     /// Set player holdings in a particular company.
-    pub fn set_holdings(&mut self, company_idx: usize, holdings: u64) {
+    pub fn set_holdings(&mut self, company_idx: usize, holdings: i64) {
         self.grow_holdings_vec(company_idx);
         self.holdings[company_idx] = holdings;
     }
@@ -65,7 +64,7 @@ impl Player {
     /// Change player holdings in a particular company.
     pub fn add_holdings_signed(&mut self, company_idx: usize, delta: i64) {
         self.grow_holdings_vec(company_idx);
-        self.holdings[company_idx] = self.holdings[company_idx].saturating_add_signed(delta);
+        self.holdings[company_idx] = self.holdings[company_idx].saturating_add(delta);
     }
 
     /// Return player cash.
