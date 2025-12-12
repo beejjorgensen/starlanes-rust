@@ -5,7 +5,7 @@
 //!
 //! [`make_move`]: crate::starlanes::StarLanes::make_move
 
-/// A divident result for the current player.
+/// A dividend result for the current player.
 #[derive(Debug)]
 pub struct Dividend {
     /// The company the dividend is from.
