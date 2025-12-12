@@ -69,20 +69,16 @@ impl Map {
     pub fn new_with_params(width: usize, height: usize, star_probability: f32) -> Self {
         let data: Vec<Vec<MapCell>> = Vec::new();
 
-        let mut m = Map {
+        Map {
             width,
             height,
             data,
             star_probability,
-        };
-
-        m.regenerate();
-
-        m
+        }
     }
 
     /// Regenerate the map, overwriting any previous map data.
-    fn regenerate(&mut self) {
+    pub fn regenerate(&mut self) {
         let mut rng = rand::rng();
 
         self.data.clear();

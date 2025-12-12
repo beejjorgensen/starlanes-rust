@@ -19,6 +19,13 @@ impl Company {
             share_price: 100,
         }
     }
+
+    /// Initialize (reset) a company.
+    pub fn init(&mut self) {
+        self.in_use = false;
+        self.size = 0;
+        self.share_price = 100;
+    }
 }
 
 impl Default for Company {

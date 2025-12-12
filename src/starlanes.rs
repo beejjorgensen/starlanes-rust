@@ -198,13 +198,15 @@ impl StarLanes {
     /// by the UI code). If `wizard` is `true`, game runs in Wizard
     /// Mode (debugging).
     pub fn init(&mut self, player_count: usize, wizard: bool) {
-        if self.state != PreInit {
+        let mut rng = rand::rng();
+
+        if self.state != PreInit && self.state != GameOver {
             panic!("init: invalid state: {:#?}", self.state);
         }
 
         self.wizard_mode = wizard;
 
-        let mut rng = rand::rng();
+        self.map.regenerate();
 
         if !(1..=4).contains(&player_count) {
             panic!("invalid player count");
@@ -213,11 +215,14 @@ impl StarLanes {
         self.turn_number = 0;
 
         self.player_count = player_count;
-
         self.current_player = rng.random_range(0..self.player_count);
-
+        self.players.clear();
         for _ in 0..player_count {
             self.players.push(Player::new());
+        }
+
+        for c in &mut self.companies {
+            c.init();
         }
 
         self.state = BeginTurn;
