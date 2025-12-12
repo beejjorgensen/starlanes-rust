@@ -41,26 +41,25 @@ impl Player {
         }
     }
 
-    /// Set player holdings in a particular company.
-    pub fn set_holdings(&mut self, company_idx: usize, holdings: u64) {
+    /// Helper function to grow the holdings vector if necessary.
+    fn grow_holdings_vec(&mut self, company_idx: usize) {
         let required_size = company_idx + 1;
 
         if self.holdings.len() < required_size {
             self.holdings.resize(required_size, 0);
         }
+    }
 
+    /// Set player holdings in a particular company.
+    pub fn set_holdings(&mut self, company_idx: usize, holdings: u64) {
+        self.grow_holdings_vec(company_idx);
         self.holdings[company_idx] = holdings;
     }
 
     /// Change player holdings in a particular company.
     pub fn change_holdings(&mut self, company_idx: usize, delta: i64) {
-        let required_size = company_idx + 1;
-
-        if self.holdings.len() < required_size {
-            self.holdings.resize(required_size, 0);
-        }
-
-        self.holdings[company_idx] = holdings;
+        self.grow_holdings_vec(company_idx);
+        self.holdings[company_idx] = self.holdings[company_idx].saturating_add_signed(delta);
     }
 
     /// Reset a player to starting conditions.

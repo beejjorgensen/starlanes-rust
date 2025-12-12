@@ -530,38 +530,29 @@ impl StarLanes {
     /// shares, negative to sell.
     pub fn trade(&mut self, co_num: usize, amount: i64) {
         if self.state != Trade(co_num) {
-            panic!("trade: invalid state for trading company {}: {:#?}", co_num, self.state);
+            panic!(
+                "trade: invalid state for trading company {}: {:#?}",
+                co_num, self.state
+            );
         }
-        
-        let player = self.get_current_player();
 
-        if amount < 0 && amount.abs() as u64 > player.cash {
+        let player = &mut self.players[self.current_player];
+
+        if amount < 0 && amount.unsigned_abs() > player.cash {
             panic!("trade: selling more stock than held");
         }
 
+        // Is there a safer way to do this?
         let cost: i64 = amount * self.companies[co_num].share_price as i64;
-        
+
         if cost > 0 && cost > player.cash as i64 {
             panic!("trade: buying more stock than cash allows");
         }
 
-        player.holdings[co_num] += amount;
-        player.cash += cost;
-        
+        player.change_holdings(co_num, amount);
+        player.cash = player.cash.saturating_add_signed(cost);
+
         self.state = self.get_next_trade_state(co_num);
-
-        TODO
-
-        /*
-        fn apply_delta(value: u64, delta: i64) -> u64 {
-        if delta >= 0 {
-            value.saturating_add(delta as u64)
-        } else {
-            value.saturating_sub((-delta) as u64)
-        }
-        */
-}
-
     }
 
     /// Called to wrap up the current player's turn.
