@@ -111,12 +111,12 @@ impl UserInterface {
             }
 
             if input.starts_with('M') {
-                ui::display_map(&self.game.map);
+                self.display_map();
                 continue;
             }
 
             if input.starts_with('S') {
-                ui::show_holdings(self.game.get_current_player(), self.game.get_companies());
+                self.show_holdings();
                 continue;
             }
 
@@ -183,12 +183,12 @@ impl UserInterface {
                 let to_buy = ui::input();
 
                 if to_buy.starts_with('M') {
-                    ui::display_map(&self.game.map);
+                    self.display_map();
                     continue;
                 }
 
                 if to_buy.starts_with('S') {
-                    ui::show_holdings(self.game.get_current_player(), self.game.get_companies());
+                    self.show_holdings();
                     continue;
                 }
 
@@ -256,7 +256,7 @@ impl UserInterface {
             loop {
                 // Main game loop
                 self.wizard_alert();
-                ui::display_map(&self.game.map);
+                self.display_map();
                 self.game.begin_turn();
                 let candidates = self.game.get_moves();
 
@@ -276,7 +276,7 @@ impl UserInterface {
                 }
             }
 
-            ui::final_stats(&self.game, &self.names);
+            self.final_stats();
             if !ui::play_again() {
                 break;
             }

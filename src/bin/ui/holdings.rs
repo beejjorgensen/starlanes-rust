@@ -1,24 +1,27 @@
 //! Show holdings UI.
-use starlanes::company::Company;
-use starlanes::player::Player;
-
+use crate::UserInterface;
 use crate::ui;
 
-/// Show the holdings of the given player.
-pub fn show_holdings(player: &Player, companies: &[Company]) {
-    ui::formfeed();
-    println!("\n\n{:<29}{:<19}YOUR HOLDINGS", "STOCK", "PRICE PER SHARE");
+impl UserInterface {
+    /// Show the holdings of the given player.
+    pub fn show_holdings(&self) {
+        let player = self.game.get_current_player();
+        let companies = self.game.get_companies();
 
-    for (i, c) in companies.iter().enumerate() {
-        if !c.in_use {
-            continue;
+        ui::formfeed();
+        println!("\n\n{:<29}{:<19}YOUR HOLDINGS", "STOCK", "PRICE PER SHARE");
+
+        for (i, c) in companies.iter().enumerate() {
+            if !c.in_use {
+                continue;
+            }
+
+            println!(
+                "{:<29}{:<19}{}",
+                ui::company_name(i),
+                c.share_price,
+                player.get_holdings(i)
+            );
         }
-
-        println!(
-            "{:<29}{:<19}{}",
-            ui::COMPANY_NAMES[i],
-            c.share_price,
-            player.get_holdings(i)
-        );
     }
 }

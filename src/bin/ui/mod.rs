@@ -10,7 +10,5 @@ mod util;
 pub use basicio::*;
 pub use company::*;
 pub use endgame::*;
-pub use holdings::*;
 pub use instructions::*;
-pub use map::*;
 pub use util::*;
