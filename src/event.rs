@@ -11,7 +11,7 @@ pub struct Dividend {
     /// The company the dividend is from.
     pub company: usize,
     /// The amount of the dividend.
-    pub amount: u64,
+    pub amount: i64,
 }
 
 pub enum Event {

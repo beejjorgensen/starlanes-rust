@@ -475,7 +475,7 @@ impl StarLanes {
             let amount = (DEFAULT_DIVIDEND_PERCENTAGE / 100.0
                 * c.share_price as f32
                 * player.get_holdings(idx) as f32)
-                .round() as u64;
+                .round() as i64;
 
             dividends.push(Dividend {
                 company: idx,
@@ -580,12 +580,12 @@ impl StarLanes {
         // Is there a safer way to do this?
         let cost: i64 = amount * self.companies[co_num].share_price as i64;
 
-        if cost > 0 && cost > cash as i64 {
+        if cost > 0 && cost > cash {
             return Err(TradeError::TooLittleCash);
         }
 
         player.add_holdings_signed(co_num, amount);
-        player.add_cash_signed(-cost);
+        player.add_cash(-cost);
 
         self.state = self.get_next_trade_state(co_num + 1);
 

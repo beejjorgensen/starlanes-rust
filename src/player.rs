@@ -1,13 +1,14 @@
 //! Player information, stock holdings and cash.
 
 /// Default cash for original game
-const DEFAULT_CASH: u64 = 6000;
+const DEFAULT_CASH: i64 = 6000;
 
 /// Player information.
 #[derive(Debug)]
 pub struct Player {
-    /// Cash on-hand.
-    cash: u64,
+    /// Cash on-hand. This is signed to potentially allow indebtedness
+    /// as a game option.
+    cash: i64,
 
     /// Holdings in various companies. This is indexed by company number.
     ///
@@ -17,7 +18,7 @@ pub struct Player {
 
     /// How much cash the player should start with at the beginning of the
     /// game.
-    starting_cash: u64,
+    starting_cash: i64,
 }
 
 impl Player {
@@ -27,7 +28,7 @@ impl Player {
     }
 
     /// Construct a new player with given parameters.
-    pub fn new_with_params(starting_cash: u64) -> Self {
+    pub fn new_with_params(starting_cash: i64) -> Self {
         Player {
             holdings: Vec::new(),
             cash: starting_cash,
@@ -68,24 +69,18 @@ impl Player {
     }
 
     /// Return player cash.
-    pub fn get_cash(&self) -> u64 {
+    pub fn get_cash(&self) -> i64 {
         self.cash
     }
 
     /// Set player cash.
-    pub fn set_cash(&mut self, cash: u64) {
+    pub fn set_cash(&mut self, cash: i64) {
         self.cash = cash;
     }
 
     /// Add to player cash.
-    pub fn add_cash(&mut self, delta: u64) -> u64 {
+    pub fn add_cash(&mut self, delta: i64) -> i64 {
         self.cash = self.cash.saturating_add(delta);
-        self.cash
-    }
-
-    /// Signed add to player cash.
-    pub fn add_cash_signed(&mut self, delta: i64) -> u64 {
-        self.cash = self.cash.saturating_add_signed(delta);
         self.cash
     }
 }
