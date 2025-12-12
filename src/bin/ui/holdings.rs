@@ -4,7 +4,7 @@ use crate::ui;
 
 impl UserInterface {
     /// Show the holdings of the given player.
-    pub fn show_holdings(&self) {
+    pub(crate) fn show_holdings(&self) {
         let player = self.game.get_current_player();
         let companies = self.game.get_companies();
 

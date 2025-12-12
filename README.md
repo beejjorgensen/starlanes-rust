@@ -42,7 +42,6 @@ WRITTEN IN ALTAIR BASIC 12/17/76
 
 ### For reimplementation
 
-* Fix the UI-in-main/UI-in-ui dichotomy
 * Merging
 * Stock Splits
 * Pass config object to `StarLanes` constructor

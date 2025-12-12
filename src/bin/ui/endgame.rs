@@ -1,9 +1,10 @@
+//! Game over functionality.
 use crate::UserInterface;
 use crate::ui;
 
 impl UserInterface {
     /// Print final stats
-    pub fn final_stats(&self) {
+    pub(crate) fn final_stats(&self) {
         let companies = self.game.get_companies();
 
         ui::special_announcement();

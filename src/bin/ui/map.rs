@@ -13,7 +13,7 @@ impl UserInterface {
     }
 
     /// Display the map.
-    pub fn display_map(&self) {
+    pub(crate) fn display_map(&self) {
         let map = &self.game.map;
 
         ui::formfeed();

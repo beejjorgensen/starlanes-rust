@@ -1,4 +1,15 @@
 //! Instructions UI.
+use crate::ui;
+
+/// Prompt for and display instructions.
+pub fn prompt_instructions() {
+    print!("DOES ANY PLAYER NEED INSTRUCTIONS");
+    let yn = ui::input();
+
+    if &yn[..1] == "Y" {
+        ui::show_instructions();
+    }
+}
 
 /// Print the instructions.
 pub fn show_instructions() {
