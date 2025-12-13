@@ -21,4 +21,8 @@ pub enum Event {
 
     /// A event representating dividends payouts for the current player.
     Dividends(Vec<Dividend>),
+
+    // Stock has split. The field is the split per one, e.g. `2` is "2
+    // for 1".
+    //Split(usize),
 }
