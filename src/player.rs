@@ -68,6 +68,12 @@ impl Player {
         self.holdings[company_idx] = self.holdings[company_idx].saturating_add(delta);
     }
 
+    /// Multiply player holdings by some factor.
+    pub fn mul_holdings(&mut self, company_idx: usize, factor: i64) {
+        self.grow_holdings_vec(company_idx);
+        self.holdings[company_idx] *= factor;
+    }
+
     /// Return player cash.
     pub fn get_cash(&self) -> i64 {
         self.cash

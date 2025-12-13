@@ -37,6 +37,7 @@ const CANDIDATE_MOVE_COUNT: usize = 5;
 const DEFAULT_STAR_PRICE_BOOST: u64 = 500;
 const DEFAULT_GROWTH_PRICE_BOOST: u64 = 100;
 const DEFAULT_OUTPOST_PRICE_BOOST: u64 = 100;
+const DEFAULT_STOCK_SPLIT_LIMIT: u64 = 3000;
 const DEFAULT_DIVIDEND_PERCENTAGE: f32 = 5.0; // percent
 const DEFAULT_FOUNDER_SHARES: i64 = 5;
 
@@ -442,6 +443,23 @@ impl StarLanes {
         company.share_price += DEFAULT_GROWTH_PRICE_BOOST;
     }
 
+    /// Do a stock split if necessary
+    fn stock_split(&mut self, co_num: usize) {
+        let company = &mut self.companies[co_num];
+
+        if company.share_price > DEFAULT_STOCK_SPLIT_LIMIT {
+            // Price is halved
+            company.share_price /= 2;
+
+            // Player's shares are doubled
+            for p in &mut self.players {
+                p.mul_holdings(co_num, 2);
+            }
+
+            // TODO add stock split event
+        }
+    }
+
     /// Do cleanup after forming or growing a company.
     ///
     /// This figures out the stock price increases due to neighboring
@@ -465,7 +483,8 @@ impl StarLanes {
 
         self.map.set(row, col, MapCell::Company(co_num as u32));
 
-        // TODO: check stock split
+        // TODO add stock split event
+        self.stock_split(co_num);
     }
 
     /// Computes the dividents for the current player.
