@@ -443,7 +443,7 @@ impl StarLanes {
         company.share_price += DEFAULT_GROWTH_PRICE_BOOST;
     }
 
-    /// Do a stock split if necessary
+    /// Do a stock split if necessary.
     fn stock_split(&mut self, co_num: usize) {
         let company = &mut self.companies[co_num];
 
