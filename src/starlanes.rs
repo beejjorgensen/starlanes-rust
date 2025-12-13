@@ -38,6 +38,7 @@ const DEFAULT_STAR_PRICE_BOOST: u64 = 500;
 const DEFAULT_GROWTH_PRICE_BOOST: u64 = 100;
 const DEFAULT_OUTPOST_PRICE_BOOST: u64 = 100;
 const DEFAULT_STOCK_SPLIT_LIMIT: u64 = 3000;
+const DEFAULT_STOCK_SPLIT_FACTOR: i64 = 2;
 const DEFAULT_DIVIDEND_PERCENTAGE: f32 = 5.0; // percent
 const DEFAULT_FOUNDER_SHARES: i64 = 5;
 
@@ -444,19 +445,20 @@ impl StarLanes {
     }
 
     /// Do a stock split if necessary.
-    fn stock_split(&mut self, co_num: usize) {
+    fn stock_split(&mut self, co_num: usize, events: &mut Vec<Event>) {
         let company = &mut self.companies[co_num];
 
         if company.share_price > DEFAULT_STOCK_SPLIT_LIMIT {
             // Price is halved
-            company.share_price /= 2;
+            company.share_price /= DEFAULT_STOCK_SPLIT_FACTOR as u64;
 
             // Player's shares are doubled
             for p in &mut self.players {
-                p.mul_holdings(co_num, 2);
+                p.mul_holdings(co_num, DEFAULT_STOCK_SPLIT_FACTOR);
             }
 
-            // TODO add stock split event
+            // Add stock split event
+            events.push(Event::Split(co_num, DEFAULT_STOCK_SPLIT_FACTOR));
         }
     }
 
@@ -469,7 +471,13 @@ impl StarLanes {
     ///
     /// This should **not** be called if there was a merge; merging
     /// handles its own cleanup.
-    fn tidy_company(&mut self, co_num: usize, move_point: Point, neighbors: &NeighborCounts) {
+    fn tidy_company(
+        &mut self,
+        co_num: usize,
+        move_point: Point,
+        neighbors: &NeighborCounts,
+        events: &mut Vec<Event>,
+    ) {
         let company = &mut self.companies[co_num];
 
         company.share_price += DEFAULT_STAR_PRICE_BOOST * neighbors.stars as u64;
@@ -483,8 +491,7 @@ impl StarLanes {
 
         self.map.set(row, col, MapCell::Company(co_num as u32));
 
-        // TODO add stock split event
-        self.stock_split(co_num);
+        self.stock_split(co_num, events);
     }
 
     /// Computes the dividents for the current player.
@@ -556,10 +563,10 @@ impl StarLanes {
             let co_num = n as usize;
 
             self.grow_company(co_num);
-            self.tidy_company(co_num, move_point, &neighbors);
+            self.tidy_company(co_num, move_point, &neighbors, &mut events);
         } else if neighbors.only_stars_outposts {
             let co_num = self.form_company();
-            self.tidy_company(co_num, move_point, &neighbors);
+            self.tidy_company(co_num, move_point, &neighbors, &mut events);
 
             events.push(Event::CompanyFormed(co_num));
         }

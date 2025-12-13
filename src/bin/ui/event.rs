@@ -18,6 +18,15 @@ impl UserInterface {
                     // dividends
                     //println("Dividends:\n{:#?}", d);
                 }
+                Event::Split(co_num, factor) => {
+                    ui::special_announcement();
+                    println!(
+                        "THE STOCK OF {} HAS SPLIT {} FOR 1!",
+                        ui::company_name(*co_num),
+                        *factor
+                    );
+                    println!("\n\n\n\n");
+                }
             }
         }
     }
