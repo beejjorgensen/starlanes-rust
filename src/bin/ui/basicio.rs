@@ -34,3 +34,18 @@ pub fn input() -> String {
     // liberty to keep the user from going insane.
     input.to_uppercase().trim().to_string()
 }
+
+/// Format a number with a leading space if positive and a minus if
+/// negative.
+pub fn format_num_signed(n: i64) -> String {
+    if n >= 0 {
+        format!(" {}", n)
+    } else {
+        n.to_string()
+    }
+}
+
+/// Format an unsigned number with a leading space.
+pub fn format_num(n: u64) -> String {
+    format!(" {}", n)
+}
