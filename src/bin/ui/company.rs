@@ -5,6 +5,7 @@ use crate::ui;
 pub fn company_formed(co_num: usize) {
     println!("A NEW SHIPPING COMPANY HAS BEEN FORMED!");
     println!("IT'S NAME IS {}", ui::company_name(co_num));
+    println!("\n\n\n\n");
 }
 
 /// Return a company name for a given index.

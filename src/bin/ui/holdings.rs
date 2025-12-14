@@ -9,7 +9,7 @@ impl UserInterface {
         let companies = self.game.get_companies();
 
         ui::formfeed();
-        println!("\n\n{:<29}{:<19}YOUR HOLDINGS", "STOCK", "PRICE PER SHARE");
+        println!("\n\n{:<29}{:<20}YOUR HOLDINGS", "STOCK", "PRICE PER SHARE");
 
         for (i, c) in companies.iter().enumerate() {
             if !c.in_use {
@@ -17,10 +17,10 @@ impl UserInterface {
             }
 
             println!(
-                "{:<29}{:<19}{}",
+                "{:<29}{: <20}{: }",
                 ui::company_name(i),
-                c.share_price,
-                player.get_holdings(i)
+                ui::format_num(c.share_price),
+                ui::format_num_signed(player.get_holdings(i))
             );
         }
     }
