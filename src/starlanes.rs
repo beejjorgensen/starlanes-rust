@@ -278,7 +278,9 @@ impl StarLanes {
             only_stars_outposts: false,
         };
 
-        let offsets: [[i32; 2]; 4] = [[0, -1], [-1, 0], [0, 1], [1, 0]];
+        // To match the original game for merge tie resolution, this
+        // MUST be in the order N, S, E, W:
+        let offsets: [[i32; 2]; 4] = [[-1, 0], [1, 0], [0, 1], [0, -1]];
 
         let mut company_count: HashMap<MapCell, usize> = HashMap::new();
 
@@ -526,6 +528,29 @@ impl StarLanes {
         }
     }
 
+    /// Merge companies.
+    fn merge(&self, _move_point: Point, neighbors: &NeighborCounts) {
+        let mut max_size: u64 = 0;
+        let mut max_size_co_num: u32 = 0;
+
+        for Point(r, c) in &neighbors.companies {
+            if let MapCell::Company(co_num) = self.map.get(*r, *c) {
+                let company_size = self.companies[co_num as usize].size;
+
+                if company_size > max_size {
+                    max_size = company_size;
+                    max_size_co_num = co_num;
+                }
+            } else {
+                panic!("merge: expected a company at {},{}", *r, *c);
+            }
+        }
+
+        println!("DEBUG: Merging into {max_size_co_num}!");
+
+        // TODO
+    }
+
     /// Called by the player to make their move at a given point. This
     /// is validated against the move list to make sure the move is
     /// valid unless [wizard mode has been set](Self::init). If wizard mode is set,
@@ -549,8 +574,8 @@ impl StarLanes {
 
         if neighbors.only_space {
             self.map.set(row, col, MapCell::Outpost);
-        // } else if neighbors.discrete_companies > 1 {
-        //  TODO merge
+        } else if neighbors.discrete_companies > 1 {
+            self.merge(move_point, &neighbors);
         } else if neighbors.discrete_companies == 1 {
             let Some(&Point(row, col)) = neighbors.companies.first() else {
                 panic!("expected there to be neighbor companies");
