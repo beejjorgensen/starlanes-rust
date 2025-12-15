@@ -20,6 +20,11 @@ impl UserInterface {
         }
     }
 
+    /// Return a particular player's name.
+    pub(crate) fn get_player_name(&self, n: usize) -> &String {
+        &self.names[n]
+    }
+
     /// Return the current player name.
     pub(crate) fn get_current_player_name(&self) -> &String {
         &self.names[self.game.get_current_player_index()]

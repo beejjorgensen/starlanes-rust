@@ -14,6 +14,19 @@ pub struct Dividend {
     pub amount: i64,
 }
 
+/// A merge result for a single player.
+#[derive(Debug)]
+pub struct MergeInfo {
+    /// The stock held in the absorbed company.
+    pub old_stock: i64,
+
+    /// The old stock amount convered to new stock.
+    pub new_stock: i64,
+
+    /// Cash bonus paid out.
+    pub bonus_paid: i64,
+}
+
 pub enum Event {
     /// A event representating company formation. The field is the company
     /// index number.
@@ -24,4 +37,8 @@ pub enum Event {
 
     /// Stock has split. Fields: company index, split factor.
     Split(usize, i64),
+
+    /// Companies have merged. Fields: remaining company, absorbed
+    /// company, and a set of MergeInfo objects for each player.
+    Merge(usize, usize, Vec<MergeInfo>),
 }

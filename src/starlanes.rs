@@ -23,7 +23,7 @@
 //! [`end_turn`]: StarLanes::end_turn
 
 use crate::company::Company;
-use crate::event::{Dividend, Event};
+use crate::event::{Dividend, Event, MergeInfo};
 use crate::map::{Map, MapCell, Point};
 use crate::player::Player;
 use rand::Rng;
@@ -528,8 +528,13 @@ impl StarLanes {
         }
     }
 
-    /// Merge companies.
-    fn merge(&self, _move_point: Point, neighbors: &NeighborCounts) {
+    /// Determine the largest neighbor company.
+    ///
+    /// In order for this to behave like the original game, this depends
+    /// on neighbor_count() assessing neighbors in the order N, S, E, W.
+    /// Yes, we could sort them, but it would be a pain in the butt.
+    /// Maybe have it return a hash instead of an array?
+    fn get_largest_neighbor_company(&self, neighbors: &NeighborCounts) -> u32 {
         let mut max_size: u64 = 0;
         let mut max_size_co_num: u32 = 0;
 
@@ -546,9 +551,34 @@ impl StarLanes {
             }
         }
 
-        println!("DEBUG: Merging into {max_size_co_num}!");
+        max_size_co_num
+    }
 
-        // TODO
+    /// Merge companies.
+    fn merge(&self, _move_point: Point, neighbors: &NeighborCounts) -> Vec<Event> {
+        let biggest_co_num = self.get_largest_neighbor_company(neighbors);
+
+        // TODO: loop through all possible mergee companies.
+
+        // TODO: compute results
+
+        let mut merge_info = Vec::new();
+
+        for p in &self.players {
+            merge_info.push(MergeInfo {
+                old_stock: 1,  // TODO
+                new_stock: 2,  // TODO
+                bonus_paid: 3, // TODO
+            });
+        }
+
+        let mut events = Vec::new();
+        let event = Event::Merge(0 /* TODO */, 1 /* TODO */, merge_info);
+        events.push(event);
+
+        // TODO stock splits
+
+        events
     }
 
     /// Called by the player to make their move at a given point. This
