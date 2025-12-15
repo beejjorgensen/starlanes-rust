@@ -38,14 +38,14 @@ impl UserInterface {
                     );
                     println!("PLEASE NOTE THE FOLLOWING TRANSACTIONS.\n");
                     println!(
-                        "{:9}{:12}{:12}{:19}BONUS PAID\n",
+                        "{:9}{:12}{:12}{:19}BONUS PAID",
                         "PLAYER", "OLD STOCK", "NEW STOCK", "TOTAL HOLDINGS"
                     );
 
                     for (i, info) in merge_info.iter().enumerate() {
                         let player = self.game.get_player(i);
                         println!(
-                            "{:9}{:12}{:12}{:19} ${}\n",
+                            "{:9}{:12}{:12}{:19} ${}",
                             self.get_player_name(i),
                             ui::format_num_signed(info.old_stock),
                             ui::format_num_signed(info.new_stock),
@@ -53,6 +53,7 @@ impl UserInterface {
                             ui::format_num_signed(info.bonus_paid)
                         );
                     }
+                    println!("\n\n\n\n");
                 }
             }
         }

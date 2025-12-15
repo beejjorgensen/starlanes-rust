@@ -555,7 +555,7 @@ impl StarLanes {
     }
 
     /// Merge companies.
-    fn merge(&self, _move_point: Point, neighbors: &NeighborCounts) -> Vec<Event> {
+    fn merge(&self, _move_point: Point, neighbors: &NeighborCounts, events: &mut Vec<Event>) {
         let biggest_co_num = self.get_largest_neighbor_company(neighbors);
 
         // TODO: loop through all possible mergee companies.
@@ -572,13 +572,10 @@ impl StarLanes {
             });
         }
 
-        let mut events = Vec::new();
         let event = Event::Merge(0 /* TODO */, 1 /* TODO */, merge_info);
         events.push(event);
 
         // TODO stock splits
-
-        events
     }
 
     /// Called by the player to make their move at a given point. This
@@ -605,7 +602,7 @@ impl StarLanes {
         if neighbors.only_space {
             self.map.set(row, col, MapCell::Outpost);
         } else if neighbors.discrete_companies > 1 {
-            self.merge(move_point, &neighbors);
+            self.merge(move_point, &neighbors, &mut events);
         } else if neighbors.discrete_companies == 1 {
             let Some(&Point(row, col)) = neighbors.companies.first() else {
                 panic!("expected there to be neighbor companies");
