@@ -119,4 +119,18 @@ impl Map {
 
         self.data[r][c]
     }
+
+    /// Convert all companies from one type to another. Doesn't change
+    /// anything other than the map.
+    pub fn convert(&mut self, conv_from: usize, conv_to: usize) {
+        for r in 0..self.height {
+            for c in 0..self.width {
+                if let MapCell::Company(existing) = self.get(r, c)
+                    && existing as usize == conv_from
+                {
+                    self.set(r, c, MapCell::Company(conv_to as u32));
+                }
+            }
+        }
+    }
 }

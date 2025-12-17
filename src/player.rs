@@ -62,7 +62,13 @@ impl Player {
         self.holdings[company_idx] = holdings;
     }
 
-    /// Change player holdings in a particular company.
+    /// Add to player holdings in a particular company.
+    pub fn add_holdings(&mut self, company_idx: usize, delta: u64) {
+        self.grow_holdings_vec(company_idx);
+        self.holdings[company_idx] = self.holdings[company_idx].saturating_add_unsigned(delta);
+    }
+
+    /// Change player holding in a particular company.
     pub fn add_holdings_signed(&mut self, company_idx: usize, delta: i64) {
         self.grow_holdings_vec(company_idx);
         self.holdings[company_idx] = self.holdings[company_idx].saturating_add(delta);
