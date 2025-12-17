@@ -635,8 +635,9 @@ impl StarLanes {
             let event = Event::Merge(biggest_co_num, company, merge_info);
             events.push(event);
 
-            // Convert all map spaces
+            // Convert all map spaces and mark company not in use
             self.map.convert(company, biggest_co_num);
+            self.companies[company].in_use = false;
 
             // Add company sizes and prices
             self.companies[biggest_co_num].size += self.companies[company].size;
