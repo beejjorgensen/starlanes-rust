@@ -1,7 +1,5 @@
 # Star Lanes, Rust Port
 
-***Incomplete, but getting there!***
-
 This is a port of the classic BASIC game [Star
 Lanes](https://github.com/beejjorgensen/starlanes-info) to Rust.
 
@@ -21,8 +19,6 @@ The library portion has been written with the intent that front-ends are
 relatively easy to bolt on.
 
 `main.rs` is an example.
-
-TODO: Better usage instructions and doc strings.
 
 ## License
 
