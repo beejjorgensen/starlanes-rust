@@ -30,7 +30,7 @@ use rand::Rng;
 use rand::prelude::SliceRandom;
 use std::collections::HashMap;
 
-const MAX_TURNS: usize = 48;
+const DEFAULT_MAX_TURNS: usize = 48;
 const DEFAULT_MAX_COMPANY_COUNT: usize = 5;
 const CANDIDATE_MOVE_COUNT: usize = 5;
 
@@ -131,7 +131,7 @@ pub struct StarLanes {
     candidate_moves: Vec<Point>,
 
     /// Various game options
-    options: StarLanesOptions,
+    pub options: StarLanesOptions,
 }
 
 impl Default for StarLanes {
@@ -149,6 +149,9 @@ pub struct StarLanesOptions {
 
     /// Wizard (cheating/debugging) mode.
     pub wizard_mode: bool,
+
+    /// Maximum number of turns in a game.
+    pub max_turns: usize,
 }
 
 impl StarLanesOptions {
@@ -157,6 +160,7 @@ impl StarLanesOptions {
         Self {
             player_count: 0,
             wizard_mode: false,
+            max_turns: DEFAULT_MAX_TURNS,
         }
     }
 }
@@ -227,11 +231,7 @@ impl StarLanes {
     }
 
     /// Reset this game object to the start of the game.
-    pub fn reset(&mut self, options: Option<StarLanesOptions>) {
-        if let Some(opts) = options {
-            self.options = opts;
-        }
-
+    pub fn reset(&mut self) {
         let mut rng = rand::rng();
 
         if self.state != PreInit && self.state != GameOver {
@@ -795,7 +795,7 @@ impl StarLanes {
 
         self.turn_number += 1;
 
-        if self.turn_number >= MAX_TURNS {
+        if self.turn_number >= self.options.max_turns {
             self.state = GameOver;
             return;
         }

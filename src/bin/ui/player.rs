@@ -7,7 +7,8 @@ impl UserInterface {
     pub(crate) fn get_player_count(&mut self) {
         print!("HOW MANY PLAYERS (2-4)");
         let count = ui::input();
-        self.player_count = count.parse().unwrap()
+        self.player_count = count.parse().unwrap();
+        self.game.options.player_count = self.player_count;
     }
 
     /// Get the player names.

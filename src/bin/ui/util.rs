@@ -21,7 +21,7 @@ pub fn special_announcement() {
 impl UserInterface {
     /// Narc on wizards.
     pub(crate) fn wizard_alert(&self) {
-        if self.wizard_mode {
+        if self.wizard_mode() {
             println!("\n*******************");
             println!("*** WIZARD MODE ***");
             println!("*******************\n");

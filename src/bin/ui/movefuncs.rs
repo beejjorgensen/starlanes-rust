@@ -76,7 +76,7 @@ impl UserInterface {
 
             let selpoint = Point(selrow, selcol);
 
-            if self.wizard_mode || candidates.contains(&selpoint) {
+            if self.wizard_mode() || candidates.contains(&selpoint) {
                 return selpoint;
             }
 
