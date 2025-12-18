@@ -1,6 +1,6 @@
 //! Main game running code.
 
-use starlanes::starlanes::StarLanes;
+use starlanes::starlanes::{StarLanes, StarLanesOptions};
 
 mod ui;
 
@@ -35,7 +35,13 @@ impl UserInterface {
         loop {
             // Play again loop.
             self.get_player_count();
-            self.game.init(self.player_count, self.wizard_mode);
+
+            let game_opts = StarLanesOptions {
+                player_count: self.player_count,
+                wizard_mode: self.wizard_mode,
+            };
+
+            self.game.reset(Some(game_opts));
             ui::prompt_instructions();
             self.get_player_names();
             self.go_first_message();

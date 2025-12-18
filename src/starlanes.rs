@@ -115,9 +115,6 @@ pub struct StarLanes {
     /// Current game state.
     state: GameState,
 
-    /// Number of players in the game.
-    player_count: usize,
-
     /// Current player's number.
     current_player: usize,
 
@@ -133,12 +130,39 @@ pub struct StarLanes {
     /// Potential moves the current player can make this turn.
     candidate_moves: Vec<Point>,
 
-    /// Removes some game restrictions for play-testing purposes.
-    wizard_mode: bool,
+    /// Various game options
+    options: StarLanesOptions,
 }
 
 impl Default for StarLanes {
     /// Creates a new default game.
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Holds options for the game.
+#[derive(Debug)]
+pub struct StarLanesOptions {
+    /// Number of players in the game.
+    pub player_count: usize,
+
+    /// Wizard (cheating/debugging) mode.
+    pub wizard_mode: bool,
+}
+
+impl StarLanesOptions {
+    /// Construct a new StarLanesOptions object.
+    pub fn new() -> Self {
+        Self {
+            player_count: 0,
+            wizard_mode: false,
+        }
+    }
+}
+
+impl Default for StarLanesOptions {
+    /// Creates a new default set of options.
     fn default() -> Self {
         Self::new()
     }
@@ -181,55 +205,59 @@ impl StarLanes {
     ///
     /// [`init`]: Self::init
     pub fn new() -> Self {
-        let mut result = StarLanes {
+        Self::new_with_options(StarLanesOptions::new())
+    }
+
+    /// Create a new partially-initialized game object with options. See [`init`] for
+    /// completing initialization.
+    ///
+    /// [`init`]: Self::init
+    pub fn new_with_options(options: StarLanesOptions) -> Self {
+        StarLanes {
             map: Map::new(),
             state: PreInit,
-            player_count: 0,
             current_player: 0,
             turn_number: 0,
             players: Vec::new(),
             max_company_count: DEFAULT_MAX_COMPANY_COUNT,
             companies: Vec::new(),
             candidate_moves: Vec::new(),
-            wizard_mode: false,
-        };
-
-        for _ in 0..DEFAULT_MAX_COMPANY_COUNT {
-            result.companies.push(Company::new());
+            options,
         }
-
-        result
     }
 
-    /// Initialize the game object for a given player count (determined
-    /// by the UI code). If `wizard` is `true`, game runs in Wizard
-    /// Mode (debugging).
-    pub fn init(&mut self, player_count: usize, wizard: bool) {
+    /// Reset this game object to the start of the game.
+    pub fn reset(&mut self, options: Option<StarLanesOptions>) {
+        if let Some(opts) = options {
+            self.options = opts;
+        }
+
         let mut rng = rand::rng();
 
         if self.state != PreInit && self.state != GameOver {
             panic!("init: invalid state: {:#?}", self.state);
         }
 
-        self.wizard_mode = wizard;
-
         self.map.regenerate();
 
-        if !(1..=4).contains(&player_count) {
+        if !(1..=4).contains(&self.options.player_count) {
             panic!("invalid player count");
         }
 
         self.turn_number = 0;
 
-        self.player_count = player_count;
-        self.current_player = rng.random_range(0..self.player_count);
+        self.current_player = rng.random_range(0..self.options.player_count);
         self.players.clear();
-        for _ in 0..player_count {
+        for _ in 0..self.options.player_count {
             self.players.push(Player::new());
         }
 
-        for c in &mut self.companies {
+        self.companies.clear();
+
+        for _ in 0..DEFAULT_MAX_COMPANY_COUNT {
+            let mut c = Company::new();
             c.init();
+            self.companies.push(c);
         }
 
         self.state = BeginTurn;
@@ -666,7 +694,7 @@ impl StarLanes {
             panic!("move: invalid state: {:#?}", self.state);
         }
 
-        if !self.wizard_mode && !self.candidate_moves.contains(&move_point) {
+        if !self.options.wizard_mode && !self.candidate_moves.contains(&move_point) {
             panic!("move: invalid move: {:?}", move_point);
         }
 
@@ -772,7 +800,7 @@ impl StarLanes {
             return;
         }
 
-        self.current_player = (self.current_player + 1) % self.player_count;
+        self.current_player = (self.current_player + 1) % self.options.player_count;
 
         self.state = BeginTurn;
     }
