@@ -32,7 +32,7 @@ use std::collections::HashMap;
 
 const DEFAULT_MAX_TURNS: usize = 48;
 const DEFAULT_MAX_COMPANY_COUNT: usize = 5;
-const CANDIDATE_MOVE_COUNT: usize = 5;
+const DEFAULT_CANDIDATE_MOVE_COUNT: usize = 5;
 
 const DEFAULT_STAR_PRICE_BOOST: u64 = 500;
 const DEFAULT_GROWTH_PRICE_BOOST: u64 = 100;
@@ -427,13 +427,13 @@ impl StarLanes {
 
         // Check if not enough legal moves remaining on board--
         // this would cause an early game-over.
-        if candidates.len() < CANDIDATE_MOVE_COUNT {
+        if candidates.len() < DEFAULT_CANDIDATE_MOVE_COUNT {
             candidates.truncate(0);
             self.state = GameOver;
             return candidates;
         }
 
-        candidates.truncate(CANDIDATE_MOVE_COUNT);
+        candidates.truncate(DEFAULT_CANDIDATE_MOVE_COUNT);
 
         // Keep a copy for us to use later
         self.candidate_moves.extend(candidates.iter().cloned());
