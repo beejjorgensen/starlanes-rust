@@ -1,6 +1,5 @@
-use super::{
-    DEFAULT_MERGE_BONUS_FACTOR, DEFAULT_MERGE_SHARE_CONVERSION, NeighborCounts, StarLanes,
-};
+use super::{DEFAULT_MERGE_BONUS_FACTOR, DEFAULT_MERGE_SHARE_CONVERSION};
+use super::{NeighborCounts, StarLanes};
 use crate::event::{Event, MergeInfo};
 use crate::map::{MapCell, Point};
 use crate::player::Player;

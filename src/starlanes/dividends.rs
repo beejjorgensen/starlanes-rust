@@ -1,4 +1,5 @@
-use super::{DEFAULT_DIVIDEND_PERCENTAGE, StarLanes};
+use super::DEFAULT_DIVIDEND_PERCENTAGE;
+use super::StarLanes;
 use crate::event::{Dividend, Event};
 
 impl StarLanes {
