@@ -23,13 +23,14 @@
 //! [`end_turn`]: StarLanes::end_turn
 
 use crate::company::Company;
-use crate::event::{Dividend, Event, MergeInfo};
+use crate::event::Event;
 use crate::map::{Map, MapCell, Point};
 use crate::player::Player;
 use rand::Rng;
 use rand::prelude::SliceRandom;
 use std::collections::HashMap;
 
+mod dividends;
 mod merge;
 
 const DEFAULT_MAX_TURNS: usize = 48;
@@ -539,38 +540,6 @@ impl StarLanes {
         self.map.set(row, col, MapCell::Company(co_num as u32));
 
         self.stock_split(co_num, events);
-    }
-
-    /// Computes the dividents for the current player.
-    ///
-    /// This also adds an [`Event`] describing the [`Dividend`] per
-    /// company that the UI can use to display the info. (The original
-    /// game did not display anything.)
-    fn dividends(&mut self, events: &mut Vec<Event>) {
-        let mut dividends: Vec<Dividend> = Vec::new();
-        let player = &mut self.players[self.current_player];
-
-        for (idx, c) in self.companies.iter().enumerate() {
-            if !c.in_use {
-                continue;
-            }
-
-            let amount = (DEFAULT_DIVIDEND_PERCENTAGE / 100.0
-                * c.share_price as f32
-                * player.get_holdings(idx) as f32)
-                .round() as i64;
-
-            dividends.push(Dividend {
-                company: idx,
-                amount,
-            });
-
-            player.add_cash(amount);
-        }
-
-        if !dividends.is_empty() {
-            events.push(Event::Dividends(dividends));
-        }
     }
 
     /// Called by the player to make their move at a given point. This

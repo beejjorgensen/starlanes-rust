@@ -1,4 +1,9 @@
-use super::*;
+use super::{
+    DEFAULT_MERGE_BONUS_FACTOR, DEFAULT_MERGE_SHARE_CONVERSION, NeighborCounts, StarLanes,
+};
+use crate::event::{Event, MergeInfo};
+use crate::map::{MapCell, Point};
+use crate::player::Player;
 
 impl StarLanes {
     /// Determine the largest neighbor company.
@@ -65,7 +70,7 @@ impl StarLanes {
     }
 
     /// Merge companies.
-    pub(crate) fn merge(
+    pub(super) fn merge(
         &mut self,
         move_point: Point,
         neighbors: &NeighborCounts,
