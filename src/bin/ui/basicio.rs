@@ -9,20 +9,19 @@ pub fn formfeed() {
 
 /// Moves the cursor to the nth column to the right.
 ///
-/// This simulates the BASIC `TAB` function. Effectively it prints n-1
-/// spaces so the the next character will be in the nth column.
+/// This simulates the BASIC `TAB` function. Effectively it prints n-1 spaces so the the next
+/// character will be in the nth column.
 ///
-/// WARNING: This function only works for the first tab--it doesn't actually
-/// do any position tracking at all.
+/// WARNING: This function only works for the first tab--it doesn't actually do any position
+/// tracking at all.
 pub fn tab(n: usize) -> String {
     format!("{:>width$}", "", width = n - 1)
 }
 
 /// Read a line of text from stdin.
 ///
-/// This simulates the BASIC `INPUT` statement to a degree, the main
-/// difference being that it always returns a string. It's up to the
-/// caller to convert to other types as needed.
+/// This simulates the BASIC `INPUT` statement to a degree, the main difference being that it
+/// always returns a string. It's up to the caller to convert to other types as needed.
 pub fn input() -> String {
     print!("? ");
     _ = io::stdout().flush();
@@ -30,13 +29,12 @@ pub fn input() -> String {
     let mut input = String::new();
     _ = io::stdin().read_line(&mut input);
 
-    // Original game only allowed uppercase input, but we'll take this
-    // liberty to keep the user from going insane.
+    // Original game only allowed uppercase input, but we'll take this liberty to keep the user
+    // from going insane.
     input.to_uppercase().trim().to_string()
 }
 
-/// Format a number with a leading space if positive and a minus if
-/// negative.
+/// Format a number with a leading space if positive and a minus if negative.
 pub fn format_num_signed(n: i64) -> String {
     if n >= 0 {
         format!(" {}", n)

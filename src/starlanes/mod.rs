@@ -12,8 +12,8 @@
 //! 8. Test [`game_is_over`].
 //! 9. `GOTO` step 3.
 //!
-//! After [`get_moves`] or [`end_turn`], the UI should check if the game
-//! is over and act accordingly.
+//! After [`get_moves`] or [`end_turn`], the UI should check if the game is over and act
+//! accordingly.
 //!
 //! [`reset`]: StarLanes::reset
 //! [`begin_turn`]: StarLanes::begin_turn
@@ -41,9 +41,8 @@ const DEFAULT_CANDIDATE_MOVE_COUNT: usize = 5;
 const DEFAULT_STAR_PRICE_BOOST: u64 = 500;
 const DEFAULT_GROWTH_PRICE_BOOST: u64 = 100;
 const DEFAULT_OUTPOST_PRICE_BOOST: u64 = 100;
-// Modifying the stock split limit and factor can have unintended
-// consequences during a merge; multiple stock splits could occur from a
-// single merge.
+// Modifying the stock split limit and factor can have unintended consequences during a merge;
+// multiple stock splits could occur from a single merge.
 const DEFAULT_STOCK_SPLIT_LIMIT: u64 = 3000;
 const DEFAULT_STOCK_SPLIT_FACTOR: i64 = 2;
 const DEFAULT_DIVIDEND_PERCENTAGE: f32 = 5.0; // percent
@@ -71,33 +70,28 @@ impl std::fmt::Display for TradeError {
 
 impl std::error::Error for TradeError {}
 
-/// Game state representation. The game state is moved by calling
-/// various methods.
+/// Game state representation. The game state is moved by calling various methods.
 #[derive(Debug, PartialEq)]
 enum GameState {
-    /// Before the game has begun. Game is ready for an
-    /// [`StarLanes::init`] call.
+    /// Before the game has begun. Game is ready for an [`StarLanes::init`] call.
     PreInit,
 
-    /// Player is beginning their turn. Game is ready for a
-    /// [`StarLanes::begin_turn`] call.
+    /// Player is beginning their turn. Game is ready for a [`StarLanes::begin_turn`] call.
     BeginTurn,
 
-    /// Player is moving. Game is ready for [`StarLanes::get_moves`] and
-    /// [`StarLanes::make_move`] calls.
+    /// Player is moving. Game is ready for [`StarLanes::get_moves`] and [`StarLanes::make_move`]
+    /// calls.
     Move,
 
-    /// Player is trading in a specific company. The original game only
-    /// allowed you to trade companies in order. Game is ready for
-    /// [`StarLanes::trade`] call.
+    /// Player is trading in a specific company. The original game only allowed you to trade
+    /// companies in order. Game is ready for [`StarLanes::trade`] call.
     Trade(usize),
 
-    /// Player is trading arbitrary companies in any order. Game is
-    /// ready for [`StarLanes::trade`] call.
+    /// Player is trading arbitrary companies in any order. Game is ready for [`StarLanes::trade`]
+    /// call.
     //FreeTrade,
 
-    /// Player has completed their turn. Game is ready for an
-    /// [`StarLanes::end_turn`] call.
+    /// Player has completed their turn. Game is ready for an [`StarLanes::end_turn`] call.
     EndTurn,
 
     /// Game is over.
@@ -112,8 +106,7 @@ pub struct StarLanes {
     /// The game map.
     pub map: Map,
 
-    /// Current game turn count. When it reaches a limit, the game is
-    /// over.
+    /// Current game turn count. When it reaches a limit, the game is over.
     turn_number: usize,
 
     /// Current game state.
@@ -176,12 +169,10 @@ impl Default for StarLanesOptions {
     }
 }
 
-/// Information about the neighbors of a particular map cell. This is
-/// used when coming up with candidate moves and determining the results
-/// of a particular player move.
+/// Information about the neighbors of a particular map cell. This is used when coming up with
+/// candidate moves and determining the results of a particular player move.
 ///
-/// Neighbors are orthogonal from the given spot. Out-of-bounds cells
-/// are not considered.
+/// Neighbors are orthogonal from the given spot. Out-of-bounds cells are not considered.
 #[derive(Debug)]
 pub(crate) struct NeighborCounts {
     /// How many neighbors are empty space.
@@ -202,22 +193,21 @@ pub(crate) struct NeighborCounts {
     /// True if there is only empty space around the cell.
     only_space: bool,
 
-    /// True if there are only stars, outposts, or empty space around
-    /// the cell.
+    /// True if there are only stars, outposts, or empty space around the cell.
     only_stars_outposts: bool,
 }
 
 impl StarLanes {
-    /// Create a new partially-initialized game object. See [`reset`] for
-    /// completing initialization.
+    /// Create a new partially-initialized game object. See [`reset`] for completing
+    /// initialization.
     ///
     /// [`reset`]: Self::reset
     pub fn new() -> Self {
         Self::new_with_options(StarLanesOptions::new())
     }
 
-    /// Create a new partially-initialized game object with options. See [`reset`] for
-    /// completing initialization.
+    /// Create a new partially-initialized game object with options. See [`reset`] for completing
+    /// initialization.
     ///
     /// [`reset`]: Self::reset
     pub fn new_with_options(options: StarLanesOptions) -> Self {
@@ -315,8 +305,8 @@ impl StarLanes {
             only_stars_outposts: false,
         };
 
-        // To match the original game for merge tie resolution, this
-        // MUST be in the order N, S, E, W:
+        // To match the original game for merge tie resolution, this MUST be in the order N, S, E,
+        // W:
         let offsets: [[i32; 2]; 4] = [[-1, 0], [1, 0], [0, 1], [0, -1]];
 
         let mut company_count: HashMap<MapCell, usize> = HashMap::new();
@@ -353,8 +343,7 @@ impl StarLanes {
         result
     }
 
-    /// Return the number of companies that are currently active in the
-    /// game.
+    /// Return the number of companies that are currently active in the game.
     fn active_company_count(&self) -> usize {
         let mut count: usize = 0;
 
@@ -367,8 +356,7 @@ impl StarLanes {
         count
     }
 
-    /// Return true if there are inactive companies available to be
-    /// formed.
+    /// Return true if there are inactive companies available to be formed.
     fn companies_available(&self) -> bool {
         self.active_company_count() < self.max_company_count
     }
@@ -380,13 +368,11 @@ impl StarLanes {
 
     /// Get the candidate moves for a particular player.
     ///
-    /// In the standard game, it's incredibly probable that there will
-    /// be enough moves available (i.e. there aren't too many filled
-    /// spots to find enough valid moves).
+    /// In the standard game, it's incredibly probable that there will be enough moves available
+    /// (i.e. there aren't too many filled spots to find enough valid moves).
     ///
-    /// **However**, if enough candidate moves cannot be found, the game
-    /// will be over. This must be checked by the UI via
-    /// [`game_is_over`].
+    /// **However**, if enough candidate moves cannot be found, the game will be over. This must be
+    /// checked by the UI via [`game_is_over`].
     ///
     /// [`game_is_over`]: Self::game_is_over
     pub fn get_moves(&mut self) -> Vec<Point> {
@@ -429,8 +415,8 @@ impl StarLanes {
 
         candidates.shuffle(&mut rng);
 
-        // Check if not enough legal moves remaining on board--
-        // this would cause an early game-over.
+        // Check if not enough legal moves remaining on board-- this would cause an early
+        // game-over.
         if candidates.len() < DEFAULT_CANDIDATE_MOVE_COUNT {
             candidates.truncate(0);
             self.state = GameOver;
@@ -445,8 +431,7 @@ impl StarLanes {
         candidates
     }
 
-    /// Form and initialize a new company. This function assumes there
-    /// are companies available.
+    /// Form and initialize a new company. This function assumes there are companies available.
     fn form_company(&mut self) -> usize {
         let company_opt = self
             .companies
@@ -485,13 +470,12 @@ impl StarLanes {
 
     /// Do cleanup after forming or growing a company.
     ///
-    /// This figures out the stock price increases due to neighboring
-    /// stars, and absorbs nearby outposts.
+    /// This figures out the stock price increases due to neighboring stars, and absorbs nearby
+    /// outposts.
     ///
     /// It also checks if a stock split occurs.
     ///
-    /// This should **not** be called if there was a merge; merging
-    /// handles its own cleanup.
+    /// This should **not** be called if there was a merge; merging handles its own cleanup.
     fn tidy_company(
         &mut self,
         co_num: usize,
@@ -515,10 +499,9 @@ impl StarLanes {
         self.stock_split(co_num, events);
     }
 
-    /// Called by the player to make their move at a given point. This
-    /// is validated against the move list to make sure the move is
-    /// valid unless [wizard mode has been set](Self::reset). If wizard
-    /// mode is set, this will panic if a move is made off the map.
+    /// Called by the player to make their move at a given point. This is validated against the
+    /// move list to make sure the move is valid unless [wizard mode has been set](Self::reset). If
+    /// wizard mode is set, this will panic if a move is made off the map.
     pub fn make_move(&mut self, move_point: Point) -> Vec<Event> {
         if self.state != Move {
             panic!("move: invalid state: {:#?}", self.state);
@@ -567,9 +550,8 @@ impl StarLanes {
         events
     }
 
-    /// Return the next company Trade state from the current one. This
-    /// is for the classic game which only allowed you to trade stocks
-    /// in alphabetical order.
+    /// Return the next company Trade state from the current one. This is for the classic game
+    /// which only allowed you to trade stocks in alphabetical order.
     fn get_next_trade_state(&self, from: usize) -> GameState {
         for (i, c) in self.companies.iter().enumerate() {
             if i >= from && c.in_use {
@@ -580,11 +562,10 @@ impl StarLanes {
         EndTurn
     }
 
-    /// Trade stock in a particular company. `amount` is the number of
-    /// shares, negative to sell.
+    /// Trade stock in a particular company. `amount` is the number of shares, negative to sell.
     pub fn trade(&mut self, co_num: usize, amount: i64) -> Result<(), TradeError> {
-        // The original game didn't check for negative values on the
-        // purchase. If this is true, this game will not check, either.
+        // The original game didn't check for negative values on the purchase. If this is true,
+        // this game will not check, either.
         const BUG_OVERSELL: bool = true;
 
         if self.state != Trade(co_num) {

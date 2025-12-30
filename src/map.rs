@@ -1,10 +1,8 @@
 //! The game map.
 //!
-//! Each [`Map`] is a grid of [`MapCell`]s. Cell 0,0 is the upper left, row
-//! zero, columm zero.
+//! Each [`Map`] is a grid of [`MapCell`]s. Cell 0,0 is the upper left, row zero, columm zero.
 //!
-//! [`Map`]: Map
-//! [`MapCell`]: MapCell
+//! [`Map`]: Map [`MapCell`]: MapCell
 
 use rand::Rng;
 
@@ -64,8 +62,7 @@ impl Map {
 
     /// Construct a new map with custom parameters.
     ///
-    /// The `star_probability` is the probability of any cell being a star,
-    /// e.g. `0.05`.
+    /// The `star_probability` is the probability of any cell being a star, e.g. `0.05`.
     pub fn new_with_params(width: usize, height: usize, star_probability: f32) -> Self {
         let data: Vec<Vec<MapCell>> = Vec::new();
 
@@ -120,8 +117,7 @@ impl Map {
         self.data[r][c]
     }
 
-    /// Convert all companies from one type to another. Doesn't change
-    /// anything other than the map.
+    /// Convert all companies from one type to another. Doesn't change anything other than the map.
     pub fn convert(&mut self, conv_from: usize, conv_to: usize) {
         for r in 0..self.height {
             for c in 0..self.width {

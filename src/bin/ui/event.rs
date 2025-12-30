@@ -14,8 +14,7 @@ impl UserInterface {
                 }
 
                 Event::Dividends(_) => {
-                    // Original game didn't display any UI for receiving
-                    // dividends
+                    // Original game didn't display any UI for receiving dividends
                     //println("Dividends:\n{:#?}", d);
                 }
 

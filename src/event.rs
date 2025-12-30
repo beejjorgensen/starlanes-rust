@@ -1,7 +1,6 @@
 //! A game event.
 //!
-//! A vector of `Event`s is returned by [`make_move`], indicating the
-//! results of the player move.
+//! A vector of `Event`s is returned by [`make_move`], indicating the results of the player move.
 //!
 //! [`make_move`]: crate::starlanes::StarLanes::make_move
 
@@ -28,8 +27,7 @@ pub struct MergeInfo {
 }
 
 pub enum Event {
-    /// A event representating company formation. The field is the company
-    /// index number.
+    /// A event representating company formation. The field is the company index number.
     CompanyFormed(usize),
 
     /// A event representating dividends payouts for the current player.
@@ -38,7 +36,7 @@ pub enum Event {
     /// Stock has split. Fields: company index, split factor.
     Split(usize, i64),
 
-    /// Companies have merged. Fields: remaining company, absorbed
-    /// company, and a set of MergeInfo objects for each player.
+    /// Companies have merged. Fields: remaining company, absorbed company, and a set of MergeInfo
+    /// objects for each player.
     Merge(usize, usize, Vec<MergeInfo>),
 }

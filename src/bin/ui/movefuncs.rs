@@ -6,9 +6,8 @@ use starlanes::map::Point;
 impl UserInterface {
     /// Have the user select a move from a group of candidates.
     pub(crate) fn get_move(&self, candidates: &[Point]) -> Point {
-        // There is a bug in the original source where the name wasn't printed
-        // again if a 'M'ap or 'S'tocks were requested. This horrid thing
-        // recreates that bug.
+        // There is a bug in the original source where the name wasn't printed again if a 'M'ap or
+        // 'S'tocks were requested. This horrid thing recreates that bug.
         let mut bug_first = true;
         let mut show_error = false;
 

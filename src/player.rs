@@ -6,18 +6,16 @@ const DEFAULT_CASH: i64 = 6000;
 /// Player information.
 #[derive(Debug)]
 pub struct Player {
-    /// Cash on-hand. This is signed to potentially allow indebtedness
-    /// as a game option.
+    /// Cash on-hand. This is signed to potentially allow indebtedness as a game option.
     cash: i64,
 
     /// Holdings in various companies. This is indexed by company number.
     ///
-    /// This really shouldn't be negative ever, but the original game
-    /// had a bug that allowed for that.
+    /// This really shouldn't be negative ever, but the original game had a bug that allowed for
+    /// that.
     holdings: Vec<i64>,
 
-    /// How much cash the player should start with at the beginning of the
-    /// game.
+    /// How much cash the player should start with at the beginning of the game.
     starting_cash: i64,
 }
 
